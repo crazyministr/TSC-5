@@ -22,7 +22,7 @@ int to_flatten(int i, int j) {
     return (r, x - r * 31);
 }
 
-;; int equal_slices(slice a, slice b) asm "SDEQ";
+int equal_slices(slice a, slice b) asm "SDEQ";
 ;; () dump_str (slice str) impure asm "STRDUMP" "DROP";
 
 () dfs(int i, int j, int n, int m, tuple maze, int X, int Q, int L, int sb) impure {
