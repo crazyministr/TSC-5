@@ -42,7 +42,7 @@
             .store_uint(public_key, 256)
             .store_uint(now() + locked_for, 32)
             .store_slice(receiver)
-            .store_uint(new_seqno - 1, 32)
+            .store_uint(new_seqno, 32)
             .end_cell()
         );
         commit();
@@ -52,13 +52,6 @@
 
         var msg = begin_cell()
             .store_uint(0x18, 6)
-            ;; addr
-            ;; .store_uint(4, 3)
-			;; ;; .store_uint(2, 2) ;; addr_std$10
-			;; ;; .store_uint(0, 1) ;; anycast nothing
-			;; .store_int(0, 8) ;; workchain_id: -1
-            ;; .store_uint(receiver, 256)
-            ;;
             .store_slice(receiver)
             .store_grams(0)
             .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1);
@@ -68,7 +61,8 @@
 }
 
 int get_seqno() method_id {
-    var cs = get_data().begin_parse().skip_bits(256 + 32 + 267);
+    var cs = get_data().begin_parse().skip_bits(256 + 32);
+    cs~load_msg_addr();
     return cs.preload_uint(32);
 }
 

@@ -116,7 +116,6 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     cell cells_to_mark = new_dict();
     repeat (L - 1) {
         cells_to_mark~udict_set_builder(20, sb, begin_cell().store_uint(0, 1));
-
         (cs, _) = tmemo.udict_get?(20, sb);
         cs~skip_bits(30);
         sb = cs~load_uint(10);
