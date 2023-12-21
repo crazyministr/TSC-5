@@ -32,6 +32,7 @@
             .store_uint(new_seqno, 32)
             .end_cell()
         );
+        commit();
     } elseif (op == 0xbb4be234) {
         throw_unless(124, execution_time < now());
         accept_message();
