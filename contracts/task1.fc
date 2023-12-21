@@ -55,11 +55,11 @@
 }
 
 int get_seqno() method_id {
-    var cs = get_data().begin_parse().skip_bits(256 + 32 + 256);
+    var cs = get_data().begin_parse().skip_bits(256 + 32 + 267);
     return cs.preload_uint(32);
 }
 
 int get_execution_time() method_id {
     var cs = get_data().begin_parse().skip_bits(256);
-    return ds.preload_uint(32);
+    return cs.preload_uint(32);
 }
