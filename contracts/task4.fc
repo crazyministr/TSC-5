@@ -17,10 +17,10 @@ int to_flatten(int i, int j) {
     return 31 * i + j;
 }
 
-(int, int) from_flatten(int x) {
-    int r = x / 31;
-    return (r, x - r * 31);
-}
+;; (int, int) from_flatten(int x) {
+;;     int r = x / 31;
+;;     return (r, x - r * 31);
+;; }
 
 int equal_slices(slice a, slice b) asm "SDEQ";
 ;; () dump_str (slice str) impure asm "STRDUMP" "DROP";
