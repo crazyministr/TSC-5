@@ -13,11 +13,10 @@
         var signature = in_msg~load_bits(512);
         var data_cell = in_msg~load_ref();
         slice data_cs = data_cell.begin_parse();
-        slice ccs = data_cs;
         var (locked_for, new_seqno) = (data_cs~load_uint(32), data_cs~load_uint(32));
 
         throw_unless(119,  new_seqno == seqno + 1);
-        throw_unless(120, check_signature(slice_hash(ccs), signature, public_key));
+        throw_unless(120, check_signature(cell_hash(data_cell), signature, public_key));
         throw_unless(121, locked_for > 0);
         throw_if(122, execution_time < now());
         throw_if(123, now() + locked_for < execution_time);
@@ -55,7 +54,8 @@
 }
 
 int get_seqno() method_id {
-    var cs = get_data().begin_parse().skip_bits(256 + 32 + 267);
+    var cs = get_data().begin_parse().skip_bits(256 + 32);
+    cs~load_msg_addr();
     return cs.preload_uint(32);
 }
 

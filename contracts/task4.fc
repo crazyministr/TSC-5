@@ -1,4 +1,4 @@
-#include "imports/stdlib.fc";
+;; #include "imports/stdlib.fc";
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
@@ -17,13 +17,13 @@ int to_flatten(int i, int j) {
     return 31 * i + j;
 }
 
-;; (int, int) from_flatten(int x) {
-;;     int r = x / 31;
-;;     return (r, x - r * 31);
-;; }
+(int, int) from_flatten(int x) {
+    int r = x / 31;
+    return (r, x - r * 31);
+}
 
 int equal_slices(slice a, slice b) asm "SDEQ";
-;; () dump_str (slice str) impure asm "STRDUMP" "DROP";
+() dump_str (slice str) impure asm "STRDUMP" "DROP";
 
 () dfs(int i, int j, int n, int m, tuple maze, int X, int Q, int L, int sb) impure {
     ;; int x = 1;
@@ -138,6 +138,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
             }
             j += 1;
         }
+        ;; dump_str("-----");
         new_maze~tpush(row);
         i += 1;
     }
