@@ -12,12 +12,12 @@
     if (op == 0x9df10277) {
 
         var signature = in_msg~load_bits(512);
-        var cs = in_msg;
-        slice data_cs = cs~load_ref().begin_parse();
+        var data_cell = in_msg~load_ref();
+        slice data_cs = data_cell.begin_parse();
         var (locked_for, new_seqno) = (data_cs~load_uint(32), data_cs~load_uint(32));
 
         throw_unless(119,  new_seqno == seqno + 1);
-        throw_unless(120, check_signature(slice_hash(in_msg), signature, public_key));
+        throw_unless(120, check_signature(cell_hash(data_cell), signature, public_key));
         throw_unless(121, locked_for > 0);
         throw_if(122, execution_time < now());
         throw_if(123, now() + locked_for < execution_time);
@@ -42,7 +42,7 @@
             .store_uint(4, 3)
 			;; .store_uint(2, 2) ;; addr_std$10
 			;; .store_uint(0, 1) ;; anycast nothing
-			.store_int(-1, 8) ;; workchain_id: -1
+			.store_int(0, 8) ;; workchain_id: -1
             .store_uint(receiver, 256)
             ;;
             .store_grams(0)
