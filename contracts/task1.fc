@@ -16,7 +16,7 @@
         slice data_cs = cs~load_ref().begin_parse();
         var (locked_for, new_seqno) = (data_cs~load_uint(32), data_cs~load_uint(32));
 
-        throw_unless(119,  new_seqno != seqno + 1);
+        throw_unless(119,  new_seqno == seqno + 1);
         throw_unless(120, check_signature(slice_hash(in_msg), signature, public_key));
         throw_unless(121, locked_for > 0);
         throw_if(122, execution_time < now());
@@ -27,7 +27,7 @@
         set_data(
             begin_cell()
             .store_uint(public_key, 256)
-            .store_uint(execution_time, 32)
+            .store_uint(now() + locked_for, 32)
             .store_uint(receiver, 256)
             .store_uint(new_seqno, 32)
             .end_cell()
@@ -39,8 +39,9 @@
         var msg = begin_cell()
             .store_uint(0x18, 6)
             ;; addr
-			.store_uint(2, 2) ;; addr_std$10
-			.store_uint(0, 1) ;; anycast nothing
+            .store_uint(4, 3)
+			;; .store_uint(2, 2) ;; addr_std$10
+			;; .store_uint(0, 1) ;; anycast nothing
 			.store_int(-1, 8) ;; workchain_id: -1
             .store_uint(receiver, 256)
             ;;
