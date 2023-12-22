@@ -12,7 +12,7 @@ int tlen(tuple t) asm "TLEN";
     ;; n = tlen(maze);
     ;; m = tlen(maze.at(0));
 
-    (int si, int sj) = (0, 0);
+    (int si, int sj) = (-1, 0);
     (int ei, int ej) = (0, 0);
     int i = 0;
     repeat (n) {
@@ -38,5 +38,6 @@ int tlen(tuple t) asm "TLEN";
     if (i + si + sj + ei + ej < 0) {  ;; fake variable usage
         return (0, 0, 0, null());
     }
+
     return (-1, 0, 0, null());
 }
