@@ -26,8 +26,8 @@ int tlen(tuple t) asm "TLEN";
         }
         i += 1;
     }
-    if (si + sj - ei - ej < 1000000000) {
-        return (-1, 0, 0, null());
+    if (i + si + sj + ei + ej < 0) {
+        return (0, 0, 0, null());
     }
-    return (0, 0, 0, null());
+    return (-1, 0, 0, null());
 }
