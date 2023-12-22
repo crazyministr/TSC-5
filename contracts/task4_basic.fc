@@ -12,25 +12,18 @@ int tlen(tuple t) asm "TLEN";
     ;; n = tlen(maze);
     ;; m = tlen(maze.at(0));
 
-    (int si, int sj) = (-1, 0);
+    (int si, int sj) = (0, 0);
     (int ei, int ej) = (0, 0);
     int i = 0;
     repeat (n) {
         int j = 0;
         slice row = maze.at(i);
         repeat (m) {
-            int char = row~load_uint(8);
-            if (char == 83) {  ;; S
+            if (custom::equal_slices(maze.at(i).at(j), "S")) {
                 (si, sj) = (i, j);
-            } elseif (char == 69) {  ;; E
+            } elseif (custom::equal_slices(maze.at(i).at(j), "E")) {
                 (ei, ej) = (i, j);
             }
-
-            ;; if (custom::equal_slices(maze.at(i).at(j), "S")) {
-            ;;     (si, sj) = (i, j);
-            ;; } elseif (custom::equal_slices(maze.at(i).at(j), "E")) {
-            ;;     (ei, ej) = (i, j);
-            ;; }
             j += 1;
         }
         i += 1;
