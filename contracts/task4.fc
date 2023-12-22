@@ -86,15 +86,15 @@ int equal_slices(slice a, slice b) asm "SDEQ";
 
 ;; X    Q    L   maze
 (int, int, int, tuple) solve_maze(int n, int m, tuple maze) method_id {
-    maze = empty_tuple();
-    maze~tpush("XXXXXXE.");
-    maze~tpush("XX!XXXX!");
-    maze~tpush("X!X!XX!X");
-    maze~tpush("!?XSXXX!");
-    maze~tpush("?!XXXXX!");
-    maze~tpush("XX!.XXX!");
-    maze~tpush("XX.!XX!X");
-    maze~tpush("XXX.!!XX");
+    ;; maze = empty_tuple();
+    ;; maze~tpush("XXXXXXE.");
+    ;; maze~tpush("XX!XXXX!");
+    ;; maze~tpush("X!X!XX!X");
+    ;; maze~tpush("!?XSXXX!");
+    ;; maze~tpush("?!XXXXX!");
+    ;; maze~tpush("XX!.XXX!");
+    ;; maze~tpush("XX.!XX!X");
+    ;; maze~tpush("XXX.!!XX");
     {-
     tuple row = empty_tuple();
     row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("E"); row~tpush(".");
@@ -120,9 +120,8 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     row = empty_tuple();
     row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("."); row~tpush("!"); row~tpush("!"); row~tpush("X"); row~tpush("X");
     maze~tpush(row);-}
-    return (1, 1, 16, maze);
+    ;; return (1, 1, 16, maze);
 
-    {-
     (int si, int sj) = (0, 0);
     (int ei, int ej) = (0, 0);
     int i = 0;
@@ -139,15 +138,10 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         i += 1;
     }
     cell memo = new_dict();
-    ;; memo = memo.udict_set_builder(20, to_flatten(si, sj), begin_cell().store_uint(0, 10).store_uint(0, 10).store_uint(1, 10).store_uint(0, 10));
-    ;; dump_str("run dfs");
     dfs(si, sj, n, m, maze, 0, 0, -1, to_flatten(si, sj));
-    ;; dump_str("dfs end");
 
     cell tmemo = memo;
     (slice cs, int f) = tmemo.udict_get?(20, to_flatten(ei, ej));
-    ;; f~dump();
-    ;; cs~dump();
     (int X, int Q, int L, int sb) = (cs~load_uint(10), cs~load_uint(10), cs~load_uint(10), cs~load_uint(10));
 
     cell cells_to_mark = new_dict();
@@ -159,9 +153,9 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     }
 
     tuple new_maze = empty_tuple();
-    int i = 0;
+    i = 0;
     repeat (n) {
-        int j = 0;
+        j = 0;
         tuple row = empty_tuple();
         repeat (m) {
             (_, int f) = cells_to_mark.udict_get?(20, to_flatten(i, j));
@@ -179,5 +173,5 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         i += 1;
     }
 
-    return (X, Q, L, new_maze);-}
+    return (X, Q, L, new_maze);
 }
