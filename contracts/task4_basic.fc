@@ -1,4 +1,4 @@
-#include "imports/stdlib.fc";
+;; #include "imports/stdlib.fc";
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
@@ -20,7 +20,12 @@ int tlen(tuple t) asm "TLEN";
         slice row = maze.at(i);
         repeat (m) {
             int char = row~load_uint(8);
-            char~dump();
+            if (char == 83) {  ;; S
+                (si, sj) = (i, j);
+            } elseif (char == 69) {  ;; E
+                (ei, ej) = (i, j);
+            }
+
             ;; if (custom::equal_slices(maze.at(i).at(j), "S")) {
             ;;     (si, sj) = (i, j);
             ;; } elseif (custom::equal_slices(maze.at(i).at(j), "E")) {
