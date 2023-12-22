@@ -5,21 +5,7 @@
 }
 
 () recv_external(slice in_msg) impure {
-    ;; slice _in_msg = in_msg;
     var ds = get_data().begin_parse();
-    ;; if (ds.slice_bits() == 0) {
-    ;;     accept_message();
-    ;;     set_data(
-    ;;         begin_cell()
-    ;;         .store_uint(0, 256)
-    ;;         .store_uint(now() + 100, 32)
-    ;;         .store_slice("EQAZsKWLxir_p9u1p_HrcnmWP4Zh2KJpKEFAKZOJRJCl58YU"a)
-    ;;         .store_uint(0, 32)
-    ;;         .end_cell()
-    ;;     );
-    ;;     commit();
-    ;;     return ();
-    ;; }
     var (public_key, execution_time, receiver, seqno) = (ds~load_uint(256), ds~load_uint(32), ds~load_msg_addr(), ds~load_uint(32));
 
     int op = in_msg~load_uint(32);
@@ -27,12 +13,10 @@
         var signature = in_msg~load_bits(512);
         var data_cell = in_msg~load_ref();
         slice data_cs = data_cell.begin_parse();
-        ;; slice ccs = data_cs;
         var (locked_for, new_seqno) = (data_cs~load_uint(32), data_cs~load_uint(32));
 
+        throw_unless(120, check_signature(cell_hash(data_cell), signature, public_key));
         throw_unless(119, new_seqno == seqno + 1);
-        throw_if(120, check_signature(cell_hash(data_cell), signature, public_key));
-        ;; throw_unless(120, check_signature(slice_hash(ccs), signature, public_key));
         throw_unless(121, locked_for > 0);
         throw_if(122, execution_time < now());
         throw_if(123, now() + locked_for < execution_time);
@@ -62,8 +46,7 @@
 }
 
 int get_seqno() method_id {
-    var cs = get_data().begin_parse().skip_bits(256 + 32);
-    cs~load_msg_addr();
+    var cs = get_data().begin_parse().skip_bits(256 + 32 + 267);
     return cs.preload_uint(32);
 }
 
