@@ -5,7 +5,7 @@
 }
 
 () recv_external(slice in_msg) impure {
-    slice _in_msg = in_msg;
+    ;; slice _in_msg = in_msg;
     var ds = get_data().begin_parse();
     ;; if (ds.slice_bits() == 0) {
     ;;     accept_message();
@@ -31,8 +31,7 @@
         var (locked_for, new_seqno) = (data_cs~load_uint(32), data_cs~load_uint(32));
 
         throw_unless(119, new_seqno == seqno + 1);
-        throw_unless(120, check_signature(slice_hash(_in_msg), signature, public_key));
-        ;; throw_unless(120, check_signature(cell_hash(data_cell), signature, public_key));
+        throw_if(120, check_signature(cell_hash(data_cell), signature, public_key));
         ;; throw_unless(120, check_signature(slice_hash(ccs), signature, public_key));
         throw_unless(121, locked_for > 0);
         throw_if(122, execution_time < now());
