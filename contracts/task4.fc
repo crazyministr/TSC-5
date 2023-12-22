@@ -88,43 +88,6 @@ int to_flatten(int i, int j) {
 
 ;; X    Q    L   maze
 (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
-    ;; maze = empty_tuple();
-    ;; maze~tpush("XXXXXXE.");
-    ;; maze~tpush("XX!XXXX!");
-    ;; maze~tpush("X!X!XX!X");
-    ;; maze~tpush("!?XSXXX!");
-    ;; maze~tpush("?!XXXXX!");
-    ;; maze~tpush("XX!.XXX!");
-    ;; maze~tpush("XX.!XX!X");
-    ;; maze~tpush("XXX.!!XX");
-    
-    {-
-    tuple row = empty_tuple();
-    row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("E"); row~tpush(".");
-    maze~tpush(row);
-    row = empty_tuple();
-    row~tpush("X"); row~tpush("X"); row~tpush("!"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("!");
-    maze~tpush(row);
-    row = empty_tuple();
-    row~tpush("X"); row~tpush("!"); row~tpush("X"); row~tpush("!"); row~tpush("X"); row~tpush("X"); row~tpush("!"); row~tpush("X");
-    maze~tpush(row);
-    row = empty_tuple();
-    row~tpush("!"); row~tpush("?"); row~tpush("X"); row~tpush("S"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("!");
-    maze~tpush(row);
-    row = empty_tuple();
-    row~tpush("?"); row~tpush("!"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("!");
-    maze~tpush(row);
-    row = empty_tuple();
-    row~tpush("X"); row~tpush("X"); row~tpush("!"); row~tpush("."); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("!");
-    maze~tpush(row);
-    row = empty_tuple();
-    row~tpush("X"); row~tpush("X"); row~tpush("."); row~tpush("!"); row~tpush("X"); row~tpush("X"); row~tpush("!"); row~tpush("X");
-    maze~tpush(row);
-    row = empty_tuple();
-    row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("."); row~tpush("!"); row~tpush("!"); row~tpush("X"); row~tpush("X");
-    maze~tpush(row);
-    return (1, 1, 16, maze);-}
-
     (int si, int sj) = (0, 0);
     (int ei, int ej) = (0, 0);
     int i = 0;
