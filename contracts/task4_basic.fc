@@ -4,6 +4,6 @@
 
 }
 
-(int, int, int, tuple) solve_maze(int n, int m, tuple maze) method_id {
-    return (-1, 0, 0, null());
-}
+;; (int, int, int, tuple) solve_maze(int n, int m, tuple maze) method_id {
+;;     return (-1, 0, 0, null());
+;; }

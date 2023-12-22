@@ -11,15 +11,14 @@
     int op = in_msg~load_uint(32);
     if (op == 0x9df10277) {
         var signature = in_msg~load_bits(512);
-        var in_msg_body = in_msg;
         var data_cell = in_msg~load_ref();
+        int xxx = check_signature(data_cell.cell_hash(), signature, public_key);
         slice data_cs = data_cell.begin_parse();
         var (locked_for, new_seqno) = (data_cs~load_uint(32), data_cs~load_uint(32));
 
         throw_unless(119, new_seqno == seqno + 1);
-        ;; throw_unless(120, check_signature(cell_hash(data_cell), signature, public_key));
-
-        throw_unless(120, check_data_signature(data_cell.begin_parse(), signature, public_key));
+        throw_unless(120, xxx);
+        ;; throw_unless(120, check_signature(data_cell.cell_hash(), signature, public_key));
         throw_unless(121, locked_for > 0);
         throw_if(122, execution_time < now());
         throw_if(123, now() + locked_for < execution_time);
