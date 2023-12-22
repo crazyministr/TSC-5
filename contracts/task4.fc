@@ -155,7 +155,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     tuple new_maze = empty_tuple();
     i = 0;
     repeat (n) {
-        j = 0;
+        int j = 0;
         tuple row = empty_tuple();
         repeat (m) {
             (_, int f) = cells_to_mark.udict_get?(20, to_flatten(i, j));
