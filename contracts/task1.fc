@@ -29,7 +29,7 @@
         slice ccs = data_cs;
         var (locked_for, new_seqno) = (data_cs~load_uint(32), data_cs~load_uint(32));
 
-        throw_unless(119,  new_seqno == seqno + 1);
+        throw_unless(119, new_seqno == seqno + 1);
         throw_unless(120, check_signature(slice_hash(ccs), signature, public_key));
         throw_unless(121, locked_for > 0);
         throw_if(122, execution_time < now());
