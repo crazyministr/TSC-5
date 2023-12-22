@@ -1,4 +1,4 @@
-#include "imports/stdlib.fc";
+;; #include "imports/stdlib.fc";
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
@@ -86,8 +86,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
 
 ;; X    Q    L   maze
 (int, int, int, tuple) solve_maze(int n, int m, tuple maze) method_id {
-    return (0, 0, 1, maze);
-    ;; maze = empty_tuple();
+    maze = empty_tuple();
     ;; maze~tpush("XXXXXXE.");
     ;; maze~tpush("XX!XXXX!");
     ;; maze~tpush("X!X!XX!X");
@@ -96,7 +95,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     ;; maze~tpush("XX!.XXX!");
     ;; maze~tpush("XX.!XX!X");
     ;; maze~tpush("XXX.!!XX");
-    {-
+    
     tuple row = empty_tuple();
     row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("E"); row~tpush(".");
     maze~tpush(row);
@@ -120,8 +119,8 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     maze~tpush(row);
     row = empty_tuple();
     row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("."); row~tpush("!"); row~tpush("!"); row~tpush("X"); row~tpush("X");
-    maze~tpush(row);-}
-    ;; return (1, 1, 16, maze);
+    maze~tpush(row);
+    return (1, 1, 16, maze);
 
     {-
     (int si, int sj) = (0, 0);
@@ -155,7 +154,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     }
 
     tuple new_maze = empty_tuple();
-    i = 0;
+    int i = 0;
     repeat (n) {
         int j = 0;
         tuple row = empty_tuple();
