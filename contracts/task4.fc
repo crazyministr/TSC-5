@@ -86,7 +86,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
 
 ;; X    Q    L   maze
 (int, int, int, tuple) solve_maze(int n, int m, tuple maze) method_id {
-    maze = empty_tuple();
+    ;; maze = empty_tuple();
     ;; maze~tpush("XXXXXXE.");
     ;; maze~tpush("XX!XXXX!");
     ;; maze~tpush("X!X!XX!X");
@@ -96,6 +96,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     ;; maze~tpush("XX.!XX!X");
     ;; maze~tpush("XXX.!!XX");
     
+    {-
     tuple row = empty_tuple();
     row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("E"); row~tpush(".");
     maze~tpush(row);
@@ -120,9 +121,8 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     row = empty_tuple();
     row~tpush("X"); row~tpush("X"); row~tpush("X"); row~tpush("."); row~tpush("!"); row~tpush("!"); row~tpush("X"); row~tpush("X");
     maze~tpush(row);
-    return (1, 1, 16, maze);
+    return (1, 1, 16, maze);-}
 
-    {-
     (int si, int sj) = (0, 0);
     (int ei, int ej) = (0, 0);
     int i = 0;
@@ -174,5 +174,5 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         i += 1;
     }
 
-    return (X, Q, L, new_maze);-}
+    return (X, Q, L, new_maze);
 }
