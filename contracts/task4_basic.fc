@@ -5,12 +5,15 @@
 }
 
 int custom::equal_slices(slice a, slice b) asm "SDEQ";
+int tlen(tuple t) asm "TLEN";
 
 ;; X    Q    L   maze
 (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
     (int si, int sj) = (0, 0);
     (int ei, int ej) = (0, 0);
     int i = 0;
+    n = tlen(maze);
+    m = tlen(maze.at(0));
     repeat (n) {
         int j = 0;
         repeat (m) {
