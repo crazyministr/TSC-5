@@ -8,6 +8,7 @@ int custom::equal_slices(slice a, slice b) asm "SDEQ";
 int tlen(tuple t) asm "TLEN";
 
 ;; X    Q    L   maze
+{-
 (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
     ;; n = tlen(maze);
     ;; m = tlen(maze.at(0));
@@ -17,7 +18,6 @@ int tlen(tuple t) asm "TLEN";
     int i = 0;
     repeat (n) {
         int j = 0;
-        slice row = maze.at(i);
         repeat (m) {
             if (custom::equal_slices(maze.at(i).at(j), "S")) {
                 (si, sj) = (i, j);
@@ -34,3 +34,4 @@ int tlen(tuple t) asm "TLEN";
 
     return (-1, 0, 0, null());
 }
+-}

@@ -22,22 +22,24 @@ int to_flatten(int i, int j) {
     return (r, x - r * 31);
 }
 
-int equal_slices(slice a, slice b) asm "SDEQ";
+;; S = 83
+;; X = 88
+;; . = 46
+;; E = 69
+;; ? = 63
+;; ! = 33
+
+;; int equal_slices(slice a, slice b) asm "SDEQ";
 ;; () dump_str (slice str) impure asm "STRDUMP" "DROP";
 
 () dfs(int i, int j, int n, int m, tuple maze, int X, int Q, int L, int sb) impure {
-    ;; int x = 1;
-    ;; x~dump();
     if ((i < 0) | (i >= n) | (j < 0) | (j >= m)) {
         return ();
     }
-    ;; x = 2;
-    ;; x~dump();
-    slice char = maze.at(i).at(j);
-    ;; dump_str(char);
-    if (equal_slices(char, "X")) {
+    int char = maze.at(i).at(j);
+    if (char == 88) {
         X += 1;
-    } elseif (equal_slices(char, "?")) {
+    } elseif (char == 63) {
         Q += 1;
     }
     L += 1;
@@ -69,7 +71,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     } else {
         memo = memo.udict_set_builder(20, flatten_pos, begin_cell().store_uint(X, 10).store_uint(Q, 10).store_uint(L, 10).store_uint(sb, 10));
     }
-    if (equal_slices(char, "E")) {
+    if (char == 69) {
         return ();
     }
     dfs(i - 1, j - 1, n, m, maze, X, Q, L, flatten_pos);
@@ -129,9 +131,10 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     repeat (n) {
         int j = 0;
         repeat (m) {
-            if (equal_slices(maze.at(i).at(j), "S")) {
+            int char = maze.at(i).at(j);
+            if (char == 83) {
                 (si, sj) = (i, j);
-            } elseif (equal_slices(maze.at(i).at(j), "E")) {
+            } elseif (char == 69) {
                 (ei, ej) = (i, j);
             }
             j += 1;
@@ -161,15 +164,12 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         repeat (m) {
             (_, int f) = cells_to_mark.udict_get?(20, to_flatten(i, j));
             if (f) {
-                row~tpush("!");
-                ;; dump_str("!");
+                row~tpush(33);
             } else {
                 row~tpush(maze.at(i).at(j));
-                ;; dump_str(maze.at(i).at(j));
             }
             j += 1;
         }
-        ;; dump_str("-----");
         new_maze~tpush(row);
         i += 1;
     }
