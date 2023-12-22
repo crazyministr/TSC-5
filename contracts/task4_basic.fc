@@ -6,25 +6,23 @@
 
 ;; X    Q    L   maze
 (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
-    return (-1, 0, 0, null());
-
-    ;; (int si, int sj) = (0, 0);
-    ;; (int ei, int ej) = (0, 0);
-    ;; int i = 0;
-    ;; repeat (n) {
-    ;;     int j = 0;
-    ;;     repeat (m) {
-    ;;         if (equal_slices(maze.at(i).at(j), "S")) {
-    ;;             (si, sj) = (i, j);
-    ;;         } elseif (equal_slices(maze.at(i).at(j), "E")) {
-    ;;             (ei, ej) = (i, j);
-    ;;         }
-    ;;         j += 1;
-    ;;     }
-    ;;     i += 1;
-    ;; }
-    ;; if (si + sj < 1000000000) {
-    ;;     return (-1, 0, 0, null());
-    ;; }
-    ;; return (0, 0, 0, null());
+    (int si, int sj) = (0, 0);
+    (int ei, int ej) = (0, 0);
+    int i = 0;
+    repeat (n) {
+        int j = 0;
+        repeat (m) {
+            if (equal_slices(maze.at(i).at(j), "S")) {
+                (si, sj) = (i, j);
+            } elseif (equal_slices(maze.at(i).at(j), "E")) {
+                (ei, ej) = (i, j);
+            }
+            j += 1;
+        }
+        i += 1;
+    }
+    if (si + sj - ei - ej < 1000000000) {
+        return (-1, 0, 0, null());
+    }
+    return (0, 0, 0, null());
 }
