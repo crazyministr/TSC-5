@@ -85,7 +85,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
 }
 
 ;; X    Q    L   maze
-(int, int, int, tuple) solve_maze(int n, int m, tuple maze) method_id {
+(int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
     ;; maze = empty_tuple();
     ;; maze~tpush("XXXXXXE.");
     ;; maze~tpush("XX!XXXX!");
