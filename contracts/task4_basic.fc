@@ -4,6 +4,8 @@
 
 }
 
+int custom::equal_slices(slice a, slice b) asm "SDEQ";
+
 ;; X    Q    L   maze
 (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
     (int si, int sj) = (0, 0);
@@ -12,9 +14,9 @@
     repeat (n) {
         int j = 0;
         repeat (m) {
-            if (equal_slices(maze.at(i).at(j), "S")) {
+            if (custom::equal_slices(maze.at(i).at(j), "S")) {
                 (si, sj) = (i, j);
-            } elseif (equal_slices(maze.at(i).at(j), "E")) {
+            } elseif (custom::equal_slices(maze.at(i).at(j), "E")) {
                 (ei, ej) = (i, j);
             }
             j += 1;
