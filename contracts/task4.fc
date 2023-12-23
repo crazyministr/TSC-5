@@ -52,6 +52,11 @@ forall X -> int is_null?(X x) asm "ISNULL";
     cell memo = new_dict();
     tuple deque = null();
 
+    int abs_si_ei = abs(si - ei);
+    int abs_sj_ej = abs(sj - ej);
+    int best_X = min(abs_si_ei, abs_sj_ej) + abs(abs_si_ei - abs_sj_ej) - 1;
+    int best_len = n * m + max(n, m) + 1;
+
     tuple data = to_tuple([si, sj, 0, 0, -1, 0]);
     deque = cons(data, deque);
     do {
@@ -68,34 +73,40 @@ forall X -> int is_null?(X x) asm "ISNULL";
         int flatten_pos = to_flatten(i, j, m);
 
         int skip = 0;
-        (slice cs, int f) = memo.udict_get?(key_len, flatten_pos);
-        if (f) {
-            (int xX, int qQ, int lL) = (cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len));
-            if (xX < X) {
-                skip = -1;
-                ;; return ();
-            } elseif (xX > X) {
-                memo = memo.udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(sb, key_len));
-            } else {  ;; eq
-                if (qQ < Q) {
+        if ((X > best_X) | (L > best_len)){
+            skip = -1;
+        }
+        if (~ skip) {
+            (slice cs, int f) = memo.udict_get?(key_len, flatten_pos);
+            if (f) {
+                (int xX, int qQ, int lL) = (cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len));
+                if (xX < X) {
                     skip = -1;
                     ;; return ();
-                } elseif (qQ > Q) {
+                } elseif (xX > X) {
                     memo = memo.udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(sb, key_len));
                 } else {  ;; eq
-                    if (lL < L) {
+                    if (qQ < Q) {
                         skip = -1;
                         ;; return ();
-                    } elseif (lL > L) {
+                    } elseif (qQ > Q) {
                         memo = memo.udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(sb, key_len));
-                    } else { ;; eq
-                        skip = -1;
-                        ;; return ();
+                    } else {  ;; eq
+                        if (lL < L) {
+                            skip = -1;
+                            ;; return ();
+                        } elseif (lL > L) {
+                            memo = memo.udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(sb, key_len));
+                        } else { ;; eq
+                            skip = -1;
+                            ;; return ();
+                        }
                     }
                 }
+            } else {
+                memo = memo.udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(sb, key_len));
             }
-        } else {
-            memo = memo.udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(sb, key_len));
+
         }
         if (char == 69) {
             skip = -1;
