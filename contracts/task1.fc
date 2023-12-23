@@ -5,9 +5,6 @@
 }
 
 () recv_external(slice in_msg) impure {
-    var ds = get_data().begin_parse();
-    var (public_key, execution_time, receiver, seqno) = (ds~load_uint(256), ds~load_uint(32), ds~load_msg_addr(), ds~load_uint(32));
-
     int op = in_msg~load_uint(32);
     if (op == 0x9df10277) {
         in_msg~skip_bits(64);
@@ -15,6 +12,9 @@
         var data_cell = in_msg~load_ref();
         slice data_cs = data_cell.begin_parse();
         var (locked_for, new_seqno) = (data_cs~load_uint(32), data_cs~load_uint(32));
+
+        var ds = get_data().begin_parse();
+        var (public_key, execution_time, receiver, seqno) = (ds~load_uint(256), ds~load_uint(32), ds~load_msg_addr(), ds.preload_uint(32));
 
         throw_unless(119, new_seqno == seqno + 1);
         throw_unless(120, check_signature(data_cell.cell_hash(), signature, public_key));
@@ -34,6 +34,9 @@
         );
         commit();
     } elseif (op == 0xbb4be234) {
+        var cs = get_data().begin_parse().skip_bits(256);
+        var (execution_time, receiver) = (cs~load_uint(32), cs~load_msg_addr());
+
         throw_if(124, execution_time > now());
         accept_message();
 
