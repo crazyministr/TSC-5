@@ -59,6 +59,8 @@ forall X -> int is_null?(X x) asm "ISNULL";
 
     tuple data = to_tuple([si, sj, 0, 0, -1, 0]);
     deque = cons(data, deque);
+    int its = n * m * n * m;
+    int it = 0;
     do {
         (data, deque) = uncons(deque);
         (int i, int j, int X, int Q, int L, int sb) = (data.at(0), data.at(1), data.at(2), data.at(3), data.at(4), data.at(5));
@@ -71,9 +73,13 @@ forall X -> int is_null?(X x) asm "ISNULL";
         }
         L += 1;
         int flatten_pos = to_flatten(i, j, m);
+        it += 1;
 
         int skip = 0;
         if ((X + Q > best_X) | (L > best_len)){
+            skip = -1;
+        }
+        if (it > its) {
             skip = -1;
         }
         if (~ skip) {
@@ -267,7 +273,7 @@ forall X -> int is_null?(X x) asm "ISNULL";
                 }
             }
         }
-    } until (is_null?(deque));
+    } until (is_null?(deque) | (it > its));
 
     (slice cs, int f) = memo.udict_get?(key_len, to_flatten(ei, ej, m));
     (int X, int Q, int L, int sb) = (cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len));
