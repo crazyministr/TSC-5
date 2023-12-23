@@ -83,10 +83,10 @@ forall X -> int is_null?(X x) asm "ISNULL";
     cell was = new_dict();
     ;; was~udict_set_builder(key_len, flatten_end, begin_cell().store_uint(1, 1));
     cell queue = new_dict();
-    queue~udict_set_builder(30, 0, begin_cell().store_uint(to_flatten(si, sj, m), 10).store_uint(0, 10));
+    queue~udict_set_builder(30, 0, begin_cell().store_uint(to_flatten(si, sj, m), 10));
 
     int f = 0;
-    memo = memo.udict_set_builder(key_len, to_flatten(si, sj, m), begin_cell().store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len));
+    memo~udict_set_builder(key_len, to_flatten(si, sj, m), begin_cell().store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len));
     do {
         (int key, slice cs, int f) = queue~udict::delete_get_min(30);
         int nxt_pos = cs~load_uint(10);
@@ -128,12 +128,14 @@ forall X -> int is_null?(X x) asm "ISNULL";
                 (slice cs, int f) = memo.udict_get?(key_len, flatten_pos);
                 if (~ f) {
                     memo~udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(nxt_pos, key_len));
-                    queue~udict_set_builder(30, to_key(X, Q, L), begin_cell().store_uint(flatten_pos, key_len).store_uint(nxt_pos, key_len));
+                    queue~udict_set_builder(30, to_key(X, Q, L), begin_cell().store_uint(flatten_pos, key_len));
                 } else {
+                    int new_key = to_key(X, Q, L);
                     (int xX, int qQ, int lL) = (cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len));
-                    if ((X < xX) | ((X == xX) & (Q < qQ)) | ((X == xX) & (Q == qQ) & (L < lL))) {
+                    int old_key = to_key(xX, qQ, lL);
+                    if (new_key < old_key) {
                         memo~udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(nxt_pos, key_len));
-                        queue~udict_set_builder(30, to_key(X, Q, L), begin_cell().store_uint(flatten_pos, key_len).store_uint(nxt_pos, key_len));
+                        queue~udict_set_builder(30, new_key, begin_cell().store_uint(flatten_pos, key_len));
                     }
                 }
             }
