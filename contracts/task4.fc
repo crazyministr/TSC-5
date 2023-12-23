@@ -73,7 +73,7 @@ forall X -> int is_null?(X x) asm "ISNULL";
         int flatten_pos = to_flatten(i, j, m);
 
         int skip = 0;
-        if ((X > best_X) | (L > best_len)){
+        if ((X + Q > best_X) | (L > best_len)){
             skip = -1;
         }
         if (~ skip) {
