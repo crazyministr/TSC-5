@@ -11,7 +11,7 @@
 ;; dfs with memo: memo[i][j] = (X, Q, L, step back): best result to reach (i, j)
 
 
-;; global cell memo;  ;; {flatten ind: (X, Q, L, sb)} flatten_ind: 20bit; X,Q,L,sb: 10bit each one
+;; global cell memo;  ;; {flatten ind: (X, Q, L, sb)} flatten_ind: 10bit; X,Q,L,sb: 10bit each one
 
 int to_flatten(int i, int j, int m) inline {
     return m * i + j;
@@ -29,7 +29,6 @@ int to_flatten(int i, int j, int m) inline {
 ;; ? = 63
 ;; ! = 33
 
-;; int equal_slices(slice a, slice b) asm "SDEQ";
 () dump_str (slice str) impure asm "STRDUMP" "DROP";
 
 forall X -> (tuple) to_tuple (X x) asm "NOP";
@@ -65,23 +64,21 @@ forall X -> int is_null?(X x) asm "ISNULL";
         to_tuple([ 1,  0]),
         to_tuple([ 1,  1])
     ]);
-    ;; d~dump();
+    int flatten_end = to_flatten(ei, ej, m);
     int key_len = 10;
     cell memo = new_dict();
     cell was = new_dict();
+    was~udict_set_builder(key_len, flatten_end, begin_cell().store_uint(1, 1));
     int f = 0;
     memo = memo.udict_set_builder(key_len, to_flatten(si, sj, m), begin_cell().store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len));
-    ;; memo~dump();
     repeat (n * m) {
         int nxt_pos = -1;
         (int X, int Q, int L) = (1000000, 0, 0);
         int key = -1;
         do {
             (key, slice cs, int f) = memo.udict_get_next?(key_len, key);
-            ;; f~dump();
             if (f) {
                 (_, int ff) = was.udict_get?(key_len, key);
-                ;; ff~dump();
                 if (~ ff) {
                     (int xX, int qQ, int lL) = (cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len));
                     if ((xX < X) | ((xX == X) & (qQ < Q)) | ((xX == X) & (qQ == Q) & (lL < L))) {
@@ -92,43 +89,39 @@ forall X -> int is_null?(X x) asm "ISNULL";
             }
         } until (~ f);
 
-        ;; dump_str("nxt_pos:");
-        ;; nxt_pos~dump();
-        was~udict_set_builder(key_len, nxt_pos, begin_cell().store_uint(1, 1));
-        (int i, int j) = from_flatten(nxt_pos, m);
-        ;; i~dump(); j~dump();
-        (int nX, int nQ, int nL) = (X, Q, L);
-        int dit = 0;
-        repeat (8) {
-            tuple dd = d.at(dit);
-            (int dx, int dy) = (dd.at(0), dd.at(1));
+        if (X < 1000000) {
+            was~udict_set_builder(key_len, nxt_pos, begin_cell().store_uint(1, 1));
+            (int i, int j) = from_flatten(nxt_pos, m);
 
-            dx += i;
-            dy += j;
-            if ((dx >= 0) & (dx < n) & (dy >= 0) & (dy < m)) {
-                int char = maze.at(dx).at(dy);
-                (X, Q, L) = (nX, nQ, nL);
-                if (char == 88) { X += 1; } elseif (char == 63) { Q += 1; } L += 1;
-                int flatten_pos = to_flatten(dx, dy, m);
-                (slice cs, int f) = memo.udict_get?(key_len, flatten_pos);
-                if (~ f) {
-                    ;; dump_str("store to memo:"); var dbg = to_tuple([dx, dy, X, Q, L]); dbg~dump();
-                    memo~udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(nxt_pos, key_len));
-                } else {
-                    (int xX, int qQ, int lL) = (cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len));
-                    if ((X < xX) | ((X == xX) & (Q < qQ)) | ((X == xX) & (Q == qQ) & (L < lL))) {
-                        ;; dump_str("store to memo:"); var dbg = to_tuple([dx, dy, X, Q, L]); dbg~dump();
+            (int nX, int nQ, int nL) = (X, Q, L);
+            int dit = 0;
+            repeat (8) {
+                tuple dd = d.at(dit);
+                (int dx, int dy) = (dd.at(0), dd.at(1));
+
+                dx += i;
+                dy += j;
+                if ((dx >= 0) & (dx < n) & (dy >= 0) & (dy < m)) {
+                    int char = maze.at(dx).at(dy);
+                    (X, Q, L) = (nX, nQ, nL);
+                    if (char == 88) { X += 1; } elseif (char == 63) { Q += 1; } L += 1;
+                    int flatten_pos = to_flatten(dx, dy, m);
+                    (slice cs, int f) = memo.udict_get?(key_len, flatten_pos);
+                    if (~ f) {
                         memo~udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(nxt_pos, key_len));
+                    } else {
+                        (int xX, int qQ, int lL) = (cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len));
+                        if ((X < xX) | ((X == xX) & (Q < qQ)) | ((X == xX) & (Q == qQ) & (L < lL))) {
+                            memo~udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(nxt_pos, key_len));
+                        }
                     }
                 }
-
+                dit += 1;
             }
-            dit += 1;
         }
-
     }
 
-    (slice cs, int f) = memo.udict_get?(key_len, to_flatten(ei, ej, m));
+    (slice cs, int f) = memo.udict_get?(key_len, flatten_end);
     (int X, int Q, int L, int sb) = (cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len));
 
     cell cells_to_mark = new_dict();
