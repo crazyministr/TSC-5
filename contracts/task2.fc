@@ -60,6 +60,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         ;; throw_unless(120, equal_slices(admin_addr, sender_address));
         throw_if(122, is_null?(users));
 
+        ;; dump_str("1");
         int total_share = 0;
         int key = -1;
         do {
@@ -69,11 +70,15 @@ int equal_slices(slice a, slice b) asm "SDEQ";
             }
         } until (~ f);
 
+        ;; dump_str("2");
+
         key = -1;
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
-            int user_share = cs.preload_uint(32);
+            ;; dump_str("3");
+            ;; dump_str("3.5");
             if (f) {
+                int user_share = cs.preload_uint(32);
                 send_raw_message(begin_cell()
                     .store_uint(0x18, 6)
                     .store_uint(4, 3) ;; addr_std$10 + anycast nothing
@@ -84,6 +89,8 @@ int equal_slices(slice a, slice b) asm "SDEQ";
                 .end_cell(), 1);
             }
         } until (~ f);
+
+        ;; dump_str("4");
     } elseif (op == 0x7362d09c) {  ;; transfer notification
         throw_if(122, is_null?(users));
 
@@ -102,8 +109,8 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         key = -1;
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
-            int user_share = cs.preload_uint(32);
             if (f) {
+                int user_share = cs.preload_uint(32);
                 send_raw_message(begin_cell()
                     .store_uint(0x18, 6)
                     .store_slice(sender_address)
