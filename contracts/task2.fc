@@ -7,7 +7,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
     var data = get_data().begin_parse();
     slice admin_addr = data~load_msg_addr();
-    cell users = data~load_dict();
+    cell users = data.preload_dict();
     ;; int total_share = 0;
     ;; if (data.slice_bits()) {
     ;;     total_share = data.preload_uint(64);
@@ -34,7 +34,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         int share = in_msg_body.preload_uint(32);
         (int wc, int addr) = parse_std_addr(user_addr);
 
-        users~udict_set(256, addr, begin_cell().store_uint(share, 32).end_cell().begin_parse());
+        users~udict_set_builder(256, addr, begin_cell().store_uint(share, 32));
         set_data(
             begin_cell()
                 .store_slice(admin_addr)
@@ -138,16 +138,14 @@ int equal_slices(slice a, slice b) asm "SDEQ";
 
 
 cell get_users() method_id {
-    var data = get_data().begin_parse();
-    slice admin_addr = data~load_msg_addr();
+    var data = get_data().begin_parse().skip_bits(267);
     return data.preload_dict();
 }
 
 int get_user_share(slice user_address) method_id {
-    var data = get_data().begin_parse();
-    slice admin_addr = data~load_msg_addr();
+    var data = get_data().begin_parse().skip_bits(267);
     cell users = data.preload_dict();
     (int wc, int addr) = parse_std_addr(user_address);
-    (slice cs, int f) = users.udict_get?(256, addr);
+    (slice cs, _) = users.udict_get?(256, addr);
     return cs.preload_uint(32);
 }
