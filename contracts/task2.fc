@@ -2,7 +2,7 @@
 
 forall X -> int is_null?(X x) asm "ISNULL";
 int equal_slices(slice a, slice b) asm "SDEQ";
-
+() dump_str (slice str) impure asm "STRDUMP" "DROP";
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
     var data = get_data().begin_parse();
@@ -30,8 +30,11 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         throw_unless(120, equal_slices(admin_addr, sender_address));
         in_msg_body~skip_bits(64);
         slice user_addr = in_msg_body~load_msg_addr();
-        (int wc, int addr) = parse_std_addr(user_addr);
         int share = in_msg_body.preload_uint(32);
+        (int wc, int addr) = parse_std_addr(user_addr);
+
+        ;; dump_str("add user"); addr~dump();
+
         users~udict_set_builder(256, addr, begin_cell().store_uint(share, 32));
         set_data(
             begin_cell()
@@ -44,6 +47,9 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         in_msg_body~skip_bits(64);
         slice user_addr = in_msg_body~load_msg_addr();
         (int wc, int addr) = parse_std_addr(user_addr);
+
+        ;; dump_str("remove user"); addr~dump();
+
         (_, int f) = users~udict_delete_get?(256, addr);
         throw_unless(121, f);
         set_data(
@@ -140,7 +146,7 @@ cell get_users() method_id {
 int get_user_share(slice user_address) method_id {
     var data = get_data().begin_parse();
     slice admin_addr = data~load_msg_addr();
-    cell users = data~load_dict();
+    cell users = data.preload_dict();
     (int wc, int addr) = parse_std_addr(user_address);
     (slice cs, int f) = users.udict_get?(256, addr);
     return cs.preload_uint(32);
