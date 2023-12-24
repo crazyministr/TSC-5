@@ -28,14 +28,13 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     int op = in_msg_body~load_uint(32);
     if (op == 0x368ddef3) {  ;; add user
         throw_unless(120, equal_slices(admin_addr, sender_address));
+
         in_msg_body~skip_bits(64);
         slice user_addr = in_msg_body~load_msg_addr();
         int share = in_msg_body.preload_uint(32);
         (int wc, int addr) = parse_std_addr(user_addr);
 
-        ;; dump_str("add user"); addr~dump();
-
-        users~udict_set_builder(256, addr, begin_cell().store_uint(share, 32));
+        users~udict_set(256, addr, begin_cell().store_uint(share, 32).end_cell().begin_parse());
         set_data(
             begin_cell()
                 .store_slice(admin_addr)
@@ -44,11 +43,10 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         );
     } elseif (op == 0x278205c8) {  ;; remove user
         throw_unless(120, equal_slices(admin_addr, sender_address));
+
         in_msg_body~skip_bits(64);
         slice user_addr = in_msg_body~load_msg_addr();
         (int wc, int addr) = parse_std_addr(user_addr);
-
-        ;; dump_str("remove user"); addr~dump();
 
         (_, int f) = users~udict_delete_get?(256, addr);
         throw_unless(121, f);
@@ -61,6 +59,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     } elseif (op == 0x068530b3) {  ;; split TON
         throw_unless(120, equal_slices(admin_addr, sender_address));
         throw_if(122, is_null?(users));
+
         int total_share = 0;
         int key = -1;
         do {
@@ -85,8 +84,9 @@ int equal_slices(slice a, slice b) asm "SDEQ";
                 .end_cell(), 1);
             }
         } until (~ f);
-    } elseif (op == 0x7362d09c) {
+    } elseif (op == 0x7362d09c) {  ;; transfer notification
         throw_if(122, is_null?(users));
+
         int query_id = in_msg_body~load_uint(64);
         int amount = in_msg_body~load_coins();
 
