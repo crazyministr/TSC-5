@@ -7,19 +7,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
     var data = get_data().begin_parse();
     slice admin_addr = data~load_msg_addr();
-    cell users = data.preload_dict();
-    ;; int total_share = 0;
-    ;; if (data.slice_bits()) {
-    ;;     total_share = data.preload_uint(64);
-    ;; } else {
-    ;;     int key = -1;
-    ;;     do {
-    ;;         (key, slice cs, int f) = users.udict_get_next?(256, key);
-    ;;         if (f) {
-    ;;             total_share += cs.preload_uint(32);
-    ;;         }
-    ;;     } until (~ f);
-    ;; }
+    cell users = data~load_dict();
 
     slice cs = in_msg_full.begin_parse();
     cs~skip_bits(4);
@@ -31,7 +19,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
 
         in_msg_body~skip_bits(64);
         slice user_addr = in_msg_body~load_msg_addr();
-        int share = in_msg_body.preload_uint(32);
+        int share = in_msg_body~load_uint(32);
         (int wc, int addr) = parse_std_addr(user_addr);
 
         users~udict_set_builder(256, addr, begin_cell().store_uint(share, 32));
@@ -59,26 +47,20 @@ int equal_slices(slice a, slice b) asm "SDEQ";
     } elseif (op == 0x068530b3) {  ;; split TON
         ;; throw_unless(120, equal_slices(admin_addr, sender_address));
         throw_if(122, is_null?(users));
-
-        ;; dump_str("1");
         int total_share = 0;
         int key = -1;
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
             if (f) {
-                total_share += cs.preload_uint(32);
+                total_share += cs~load_uint(32);
             }
         } until (~ f);
-
-        ;; dump_str("2");
 
         key = -1;
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
-            ;; dump_str("3");
-            ;; dump_str("3.5");
             if (f) {
-                int user_share = cs.preload_uint(32);
+                int user_share = cs~load_uint(32);
                 send_raw_message(begin_cell()
                     .store_uint(0x18, 6)
                     .store_uint(4, 3) ;; addr_std$10 + anycast nothing
@@ -89,8 +71,6 @@ int equal_slices(slice a, slice b) asm "SDEQ";
                 .end_cell(), 1);
             }
         } until (~ f);
-
-        ;; dump_str("4");
     } elseif (op == 0x7362d09c) {  ;; transfer notification
         throw_if(122, is_null?(users));
 
@@ -102,7 +82,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
             if (f) {
-                total_share += cs.preload_uint(32);
+                total_share += cs~load_uint(32);
             }
         } until (~ f);
 
@@ -110,7 +90,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
             if (f) {
-                int user_share = cs.preload_uint(32);
+                int user_share = cs~load_uint(32);
                 send_raw_message(begin_cell()
                     .store_uint(0x18, 6)
                     .store_slice(sender_address)
@@ -139,7 +119,6 @@ int equal_slices(slice a, slice b) asm "SDEQ";
                 .end_cell(), 1);
             }
         } until (~ f);
-
     }
 }
 
