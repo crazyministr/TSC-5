@@ -18,10 +18,9 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         throw_unless(120, equal_slices(admin_addr, sender_address));
 
         in_msg_body~skip_bits(64);
-        int addr = in_msg_body~load_uint(256);
-        ;; slice user_addr = in_msg_body~load_msg_addr();
+        slice user_addr = in_msg_body~load_msg_addr();
         int share = in_msg_body~load_uint(32);
-        ;; (int wc, int addr) = parse_std_addr(user_addr);
+        (int wc, int addr) = parse_std_addr(user_addr);
 
         users~udict_set_builder(256, addr, begin_cell().store_uint(share, 32));
         set_data(
@@ -34,9 +33,8 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         throw_unless(120, equal_slices(admin_addr, sender_address));
 
         in_msg_body~skip_bits(64);
-        int addr = in_msg_body~load_uint(256);
-        ;; slice user_addr = in_msg_body~load_msg_addr();
-        ;; (int wc, int addr) = parse_std_addr(user_addr);
+        slice user_addr = in_msg_body~load_msg_addr();
+        (int wc, int addr) = parse_std_addr(user_addr);
 
         (_, int f) = users~udict_delete_get?(256, addr);
         throw_unless(121, f);
@@ -58,6 +56,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
             }
         } until (~ f);
 
+        throw_if(122, total_share == 0);
         key = -1;
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
@@ -87,6 +86,8 @@ int equal_slices(slice a, slice b) asm "SDEQ";
                 total_share += cs~load_uint(32);
             }
         } until (~ f);
+
+        throw_if(122, total_share == 0);
 
         key = -1;
         do {
