@@ -85,7 +85,8 @@ forall X -> int is_null?(X x) asm "ISNULL";
     int key_len = 10;
     cell memo = new_dict();
     cell queue = new_dict();
-    queue~udict_set_builder(40, to_key(0,0,0,to_flatten(si,sj,m)), begin_cell().store_uint(to_flatten(si, sj, m), 10));
+    builder emptyb = begin_cell();
+    queue~udict_set_builder(40, to_key(0,0,0,to_flatten(si,sj,m)), emptyb);
 
     int f = 0;
     memo~udict_set_builder(key_len, to_flatten(si, sj, m), begin_cell().store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len));
@@ -117,7 +118,7 @@ forall X -> int is_null?(X x) asm "ISNULL";
                     ;; dump_str("set to memo/queue nxt (dx, dy):");
                     ;; dx~dump(); dy~dump();  new_key~dump();
                     memo~udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(nxt_pos, key_len));
-                    queue~udict_set_builder(40, new_key, begin_cell().store_uint(flatten_pos, key_len));
+                    queue~udict_set_builder(40, new_key, emptyb);
                 } else {
                     (int xX, int qQ, int lL) = (cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len));
                     int old_key = to_key(xX, qQ, lL, flatten_pos);
@@ -126,7 +127,7 @@ forall X -> int is_null?(X x) asm "ISNULL";
                         ;; dx~dump(); dy~dump(); new_key~dump();
 
                         memo~udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(nxt_pos, key_len));
-                        queue~udict_set_builder(40, new_key, begin_cell().store_uint(flatten_pos, key_len));
+                        queue~udict_set_builder(40, new_key, emptyb);
                     }
                 }
             }
@@ -139,7 +140,7 @@ forall X -> int is_null?(X x) asm "ISNULL";
 
     cell cells_to_mark = new_dict();
     repeat (L - 1) {
-        cells_to_mark~udict_set_builder(key_len, sb, begin_cell().store_uint(0, 1));
+        cells_to_mark~udict_set_builder(key_len, sb, emptyb);
         (cs, _) = memo.udict_get?(key_len, sb);
         cs~skip_bits(key_len * 3);
         sb = cs~load_uint(key_len);
