@@ -1,5 +1,112 @@
-#include "imports/stdlib.fc";
+forall X -> int is_null?(X x) asm "ISNULL";
 
-() recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
+;; versioning storage is simple: {version_id:uint32 : storage:Cell}
+;; storage:(HashmapE 32 Cell)
 
+int get_current_version() {
+    cell full_storage = get_data().begin_parse().preload_dict();
+    (int key, _, int f) = full_storage.udict_get_max_ref?(32);
+    if (f) {
+        return key;
+    }
+    return 0;
 }
+
+cell get_versioned_storage(int version_id) {
+    cell full_storage = get_data().begin_parse().preload_dict();
+    (cell storage, int f) = full_storage.udict_get_ref?(32, version_id);
+    return storage;
+}
+
+cell get_storage() {
+    cell full_storage = get_data().begin_parse().preload_dict();
+    (int key, cell storage, int f) = full_storage.udict_get_max_ref?(32);
+    return storage;
+}
+
+cell wrap_storage(int version_id, cell storage) {
+    cell full_storage = get_data().begin_parse().preload_dict();
+    full_storage~udict_set_ref(32, version_id, storage);
+    return full_storage;
+}
+
+int version() method_id {
+    return get_current_version();
+}
+
+
+() recv_internal(int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
+    if (in_msg_body.slice_empty?()) {
+        return ();
+    }
+
+    int expected_version = in_msg_body~load_uint(32); ;; expected version
+    cell new_code = in_msg_body~load_maybe_ref(); ;; expected code
+    cell migrations = in_msg_body~load_dict(); ;; migrations
+    cell payload = in_msg_body~load_ref();
+
+    if (expected_version == 0) {
+        cell default_storage = get_data();
+        cell full_storage = new_dict();
+        full_storage~udict_set_ref(32, 1, default_storage);
+        set_data(
+            begin_cell()
+                .store_dict(full_storage)  ;; {version_id:uint32 : storage:Cell}
+            .end_cell()
+        );
+        return ();
+    }
+
+    if (~ is_null?(new_code)) {
+        set_code(new_code);
+    }
+
+    int current_version = get_current_version();
+
+    if (~ migrations.dict_empty?()) {
+        cell full_storage = get_data().begin_parse().preload_dict();
+        (int prev_version, int key) = (-1, -1);
+        do {
+            (key, slice cs, int f) = migrations.udict_get_next?(32, key);
+            if (f) {
+                int new_version = cs~load_uint(32);
+                cell migration_code = cs.preload_maybe_ref();
+                throw_if(400, (prev_version != -1) & (prev_version + 1 != new_version));
+                if (~ is_null?(migration_code)) {
+                    set_c3(migration_code.begin_parse().bless());
+
+                    (cell old_storage, int f) = full_storage.udict_get_ref?(32, key);
+                    throw_unless(400, f);
+
+                    cell new_storage = migrate_one(old_storage);
+                    wrap_storage(new_version, new_storage);
+                }
+                prev_version = new_version;
+            }
+        } until (~ f);
+        throw_unless(400, (prev_version >= current_version) & (prev_version >= expected_version));
+    }
+
+    cell storage = process_message(get_storage(), msg_value, balance, in_msg_full, payload.begin_parse());
+
+    set_data(wrap_storage(current_version + 1, storage));
+}
+
+;; <<<<< Custom version-specific code begins
+;; This section (everything between << and >> characters) will be fully substituted for each version.
+;; This is an IMPORTANT part, and these exact lines with <<<<< and >>>>> must be present in your code for the testing system to work correctly.
+;; All the code provided here serves as an example of the version-code, which your update code must be compatible with.
+;; Refer to the "3-example" directory for more version examples.
+
+;; from counter-v0.fc
+cell process_message(cell storage, int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
+    slice cs = storage.begin_parse();
+    int current_amount = cs.preload_uint(32);
+    return begin_cell().store_uint(current_amount + 1, 32).end_cell();
+}
+
+cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required for correct compilation
+    return old_storage;
+}
+
+;; Custom version-specific code ends >>>>>
