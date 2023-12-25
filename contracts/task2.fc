@@ -8,14 +8,15 @@
 
     int op = in_msg_body~load_uint(32);
     if (op == 0x368ddef3) {  ;; ADD
-        slice cs = in_msg_full.begin_parse();
-        cs~skip_bits(4);
-        slice sender = cs~load_msg_addr();
+        slice cs = get_data().begin_parse();
+        slice admin = cs~load_msg_addr();
+
+        slice cs2 = in_msg_full.begin_parse();
+        cs2~skip_bits(4);
+        slice sender = cs2~load_msg_addr();
 
         throw_unless(120, equal_slices(admin, sender));
 
-        slice cs = get_data().begin_parse();
-        slice admin = cs~load_msg_addr();
         cell users = cs.preload_dict();
 
         in_msg_body~skip_bits(64);
@@ -33,14 +34,15 @@
         return ();
     }
     if (op == 0x278205c8) {  ;; REMOVE
-        slice cs = in_msg_full.begin_parse();
-        cs~skip_bits(4);
-        slice sender = cs~load_msg_addr();
+        slice cs = get_data().begin_parse();
+        slice admin = cs~load_msg_addr();
+
+        slice cs2 = in_msg_full.begin_parse();
+        cs2~skip_bits(4);
+        slice sender = cs2~load_msg_addr();
 
         throw_unless(120, equal_slices(admin, sender));
 
-        slice cs = get_data().begin_parse();
-        slice admin = cs~load_msg_addr();
         cell users = cs.preload_dict();
 
         in_msg_body~skip_bits(64);
