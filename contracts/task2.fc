@@ -7,7 +7,19 @@ int equal_slices(slice a, slice b) asm "SDEQ";
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
     var data = get_data().begin_parse();
     slice admin_addr = data~load_msg_addr();
-    cell users = data~load_dict();
+    cell users = data.preload_dict();
+    ;; int total_share = 0;
+    ;; if (data.slice_bits()) {
+    ;;     total_share = data.preload_uint(64);
+    ;; } else {
+    ;;     int key = -1;
+    ;;     do {
+    ;;         (key, slice cs, int f) = users.udict_get_next?(256, key);
+    ;;         if (f) {
+    ;;             total_share += cs.preload_uint(32);
+    ;;         }
+    ;;     } until (~ f);
+    ;; }
 
     slice cs = in_msg_full.begin_parse();
     cs~skip_bits(4);
@@ -20,7 +32,9 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         in_msg_body~skip_bits(64);
         slice user_addr = in_msg_body~load_msg_addr();
         int share = in_msg_body~load_uint(32);
-        (int wc, int addr) = parse_std_addr(user_addr);
+        user_addr~skip_bits(11);
+        int addr = user_addr.preload_uint(256);
+        ;; (int wc, int addr) = parse_std_addr(user_addr);
 
         users~udict_set_builder(256, addr, begin_cell().store_uint(share, 32));
         set_data(
@@ -34,7 +48,9 @@ int equal_slices(slice a, slice b) asm "SDEQ";
 
         in_msg_body~skip_bits(64);
         slice user_addr = in_msg_body~load_msg_addr();
-        (int wc, int addr) = parse_std_addr(user_addr);
+        ;; (int wc, int addr) = parse_std_addr(user_addr);
+        user_addr~skip_bits(11);
+        int addr = user_addr.preload_uint(256);
 
         (_, int f) = users~udict_delete_get?(256, addr);
         throw_unless(121, f);
@@ -56,7 +72,6 @@ int equal_slices(slice a, slice b) asm "SDEQ";
             }
         } until (~ f);
 
-        throw_if(122, total_share == 0);
         key = -1;
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
@@ -86,8 +101,6 @@ int equal_slices(slice a, slice b) asm "SDEQ";
                 total_share += cs~load_uint(32);
             }
         } until (~ f);
-
-        throw_if(122, total_share == 0);
 
         key = -1;
         do {
@@ -124,7 +137,6 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         } until (~ f);
     }
 }
-
 
 cell get_users() method_id {
     var data = get_data().begin_parse().skip_bits(267);
