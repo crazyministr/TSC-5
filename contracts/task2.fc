@@ -30,8 +30,9 @@
                 .store_dict(users)
             .end_cell()
         );
-
-    } elseif (op == 0x278205c8) {
+        return ();
+    }
+    if (op == 0x278205c8) {
         var cs = get_data().begin_parse();
         slice admin = cs~load_msg_addr();
         cell users = cs.preload_dict();
@@ -39,7 +40,6 @@
         cs = in_msg_full.begin_parse();
         cs~skip_bits(4);
         slice sender = cs~load_msg_addr();
-
 
         throw_unless(120, equal_slices(admin, sender));
 
@@ -55,8 +55,10 @@
                 .store_dict(users)
             .end_cell()
         );
+        return ();
 
-    } elseif (op == 0x068530b3) {
+    }
+    if (op == 0x068530b3) {
         var cs = get_data().begin_parse();
         slice admin = cs~load_msg_addr();
         cell users = cs.preload_dict();
@@ -69,8 +71,9 @@
 
         int total_share = 0;
         int key = -1;
+        cell tusers = users;
         do {
-            (key, slice cs, int f) = users.udict_get_next?(256, key);
+            (key, slice cs, int f) = tusers.udict_get_next?(256, key);
             if (f) {
                 total_share += cs.preload_uint(32);
             }
@@ -89,8 +92,9 @@
                 .end_cell(), 1);
             }
         } until (~ f);
-
-    } elseif (op == 0x7362d09c) {
+        return ();
+    }
+    if (op == 0x7362d09c) {
         var cs = get_data().begin_parse();
         slice admin = cs~load_msg_addr();
         cell users = cs.preload_dict();
@@ -106,8 +110,9 @@
 
         int total_share = 0;
         int key = -1;
+        cell tusers = users;
         do {
-            (key, slice cs, int f) = users.udict_get_next?(256, key);
+            (key, slice cs, int f) = tusers.udict_get_next?(256, key);
             if (f) {
                 total_share += cs.preload_uint(32);
             }
@@ -138,7 +143,7 @@
                 .end_cell(), 1);
             }
         } until (~ f);
-        
+        return ();
     }
 }
 
