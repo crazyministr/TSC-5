@@ -16,7 +16,7 @@
     int op = in_msg_body~load_uint(32);
     if (op == 0x368ddef3) {
         throw_unless(120, equal_slices(admin, sender));
-        ;; in_msg_body~skip_bits(64);
+        in_msg_body~skip_bits(64);
         slice user_addr = in_msg_body~load_msg_addr();
         int share = in_msg_body.preload_uint(32);
         (_, int user_id) = parse_std_addr(user_addr);
@@ -31,7 +31,7 @@
 
     } elseif (op == 0x278205c8) {
         throw_unless(120, equal_slices(admin, sender));
-        ;; in_msg_body~skip_bits(64);
+        in_msg_body~skip_bits(64);
         slice user_addr = in_msg_body~load_msg_addr();
         (_, int user_id) = parse_std_addr(user_addr);
 
