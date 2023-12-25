@@ -5,70 +5,53 @@ int equal_slices(slice a, slice b) asm "SDEQ";
 () dump_str (slice str) impure asm "STRDUMP" "DROP";
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
-    var data = get_data().begin_parse();
-    slice admin_addr = data~load_msg_addr();
-    cell users = data.preload_dict();
-    ;; int total_share = 0;
-    ;; if (data.slice_bits()) {
-    ;;     total_share = data.preload_uint(64);
-    ;; } else {
-    ;;     int key = -1;
-    ;;     do {
-    ;;         (key, slice cs, int f) = users.udict_get_next?(256, key);
-    ;;         if (f) {
-    ;;             total_share += cs.preload_uint(32);
-    ;;         }
-    ;;     } until (~ f);
-    ;; }
+    var cs = get_data().begin_parse();
+    slice admin = cs~load_msg_addr();
+    cell users = cs.preload_dict();
 
-    slice cs = in_msg_full.begin_parse();
+    cs = in_msg_full.begin_parse();
     cs~skip_bits(4);
-    slice sender_address = cs~load_msg_addr();
+    slice sender = cs~load_msg_addr();
 
     int op = in_msg_body~load_uint(32);
-    if (op == 0x368ddef3) {  ;; add user
-        throw_unless(120, equal_slices(admin_addr, sender_address));
-
+    if (op == 0x368ddef3) {
+        throw_unless(120, equal_slices(admin, sender));
         in_msg_body~skip_bits(64);
         slice user_addr = in_msg_body~load_msg_addr();
-        int share = in_msg_body~load_uint(32);
-        user_addr~skip_bits(11);
-        int addr = user_addr.preload_uint(256);
-        ;; (int wc, int addr) = parse_std_addr(user_addr);
+        int share = in_msg_body.preload_uint(32);
+        (_, int user_id) = parse_std_addr(user_addr);
 
-        users~udict_set_builder(256, addr, begin_cell().store_uint(share, 32));
+        users~udict_set_builder(256, user_id, begin_cell().store_uint(share, 32));
         set_data(
             begin_cell()
-                .store_slice(admin_addr)
+                .store_slice(admin)
                 .store_dict(users)
             .end_cell()
         );
-    } elseif (op == 0x278205c8) {  ;; remove user
-        throw_unless(120, equal_slices(admin_addr, sender_address));
 
+    } elseif (op == 0x278205c8) {
+        throw_unless(120, equal_slices(admin, sender));
         in_msg_body~skip_bits(64);
         slice user_addr = in_msg_body~load_msg_addr();
-        ;; (int wc, int addr) = parse_std_addr(user_addr);
-        user_addr~skip_bits(11);
-        int addr = user_addr.preload_uint(256);
+        (_, int user_id) = parse_std_addr(user_addr);
 
-        (_, int f) = users~udict_delete_get?(256, addr);
+        (_, int f) = users~udict_delete_get?(256, user_id);
         throw_unless(121, f);
         set_data(
             begin_cell()
-                .store_slice(admin_addr)
+                .store_slice(admin)
                 .store_dict(users)
             .end_cell()
         );
-    } elseif (op == 0x068530b3) {  ;; split TON
-        ;; throw_unless(120, equal_slices(admin_addr, sender_address));
+
+    } elseif (op == 0x068530b3) {
         throw_if(122, is_null?(users));
         int total_share = 0;
         int key = -1;
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
             if (f) {
-                total_share += cs~load_uint(32);
+                total_share += cs.preload_uint(32);
             }
         } until (~ f);
 
@@ -76,20 +59,18 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
             if (f) {
-                int user_share = cs~load_uint(32);
+                int share = cs.preload_uint(32);
                 send_raw_message(begin_cell()
                     .store_uint(0x18, 6)
-                    .store_uint(4, 3) ;; addr_std$10 + anycast nothing
-                    .store_int(0, 8) ;; workchain_id: 0
-                    .store_uint(key, 256)
-                    .store_coins(user_share * msg_value / total_share)
+                    .store_uint(4, 3).store_int(0, 8).store_uint(key, 256)
+                    .store_coins(share * msg_value / total_share)
                     .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
                 .end_cell(), 1);
             }
         } until (~ f);
-    } elseif (op == 0x7362d09c) {  ;; transfer notification
-        throw_if(122, is_null?(users));
 
+    } elseif (op == 0x7362d09c) {
+        throw_if(122, is_null?(users));
         int query_id = in_msg_body~load_uint(64);
         int amount = in_msg_body~load_coins();
 
@@ -98,7 +79,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
             if (f) {
-                total_share += cs~load_uint(32);
+                total_share += cs.preload_uint(32);
             }
         } until (~ f);
 
@@ -106,35 +87,27 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
             if (f) {
-                int user_share = cs~load_uint(32);
+                int share = cs.preload_uint(32);
                 send_raw_message(begin_cell()
                     .store_uint(0x18, 6)
-                    .store_slice(sender_address)
-                    .store_coins(20000000)  ;; 0.02 TON
+                    .store_slice(sender)
+                    .store_coins(20000000)
                     .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1)
                     .store_ref(
                         begin_cell()
                             .store_uint(0x0f8a7ea5, 32)
                             .store_uint(query_id, 64)
-                            .store_coins(user_share * amount / total_share)
-
-                            .store_uint(4, 3) ;; addr_std$10 + anycast nothing
-                            .store_int(0, 8) ;; workchain_id: 0
-                            .store_uint(key, 256)
-
-                            .store_uint(4, 3) ;; addr_std$10 + anycast nothing
-                            .store_int(0, 8) ;; workchain_id: 0
-                            .store_uint(key, 256)
-
-                            .store_uint(0, 1)  ;; NO custom payload
-                            .store_coins(1)  ;; forward amount
-                            .store_uint(0, 1)  ;; NO forward payload
-
+                            .store_uint(4, 3).store_int(0, 8).store_uint(key, 256)
+                            .store_uint(4, 3).store_int(0, 8).store_uint(key, 256)
+                            .store_uint(0, 1)
+                            .store_coins(1)
+                            .store_uint(0, 1)
                         .end_cell()
                     )
                 .end_cell(), 1);
             }
         } until (~ f);
+        
     }
 }
 
