@@ -3,6 +3,8 @@ forall X -> int is_null?(X x) asm "ISNULL";
 ;; versioning storage is simple: {version_id:uint32 : storage:Cell}
 ;; storage:(HashmapE 32 Cell)
 
+global int g_current_version;
+
 int get_current_version() {
     cell full_storage = get_data().begin_parse().preload_dict();
     (int key, _, int f) = full_storage.udict_get_max_ref?(32);
@@ -19,9 +21,10 @@ cell get_versioned_storage(int version_id) {
 }
 
 cell get_storage() {
-    cell full_storage = get_data().begin_parse().preload_dict();
-    (int key, cell storage, int f) = full_storage.udict_get_max_ref?(32);
-    return storage;
+    return get_versioned_storage(g_current_version);
+    ;; cell full_storage = get_data().begin_parse().preload_dict();
+    ;; (int key, cell storage, int f) = full_storage.udict_get_max_ref?(32);
+    ;; return storage;
 }
 
 cell wrap_storage(int version_id, cell storage) {
@@ -87,6 +90,7 @@ int version() method_id {
         throw_unless(400, (prev_version >= current_version) & (prev_version >= expected_version));
     }
 
+    int g_current_version = current_version;
     cell storage = process_message(get_storage(), msg_value, balance, in_msg_full, payload.begin_parse());
 
     set_data(wrap_storage(current_version + 1, storage));
@@ -99,14 +103,14 @@ int version() method_id {
 ;; Refer to the "3-example" directory for more version examples.
 
 ;; from counter-v0.fc
-;; cell process_message(cell storage, int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
-;;     slice cs = storage.begin_parse();
-;;     int current_amount = cs.preload_uint(32);
-;;     return begin_cell().store_uint(current_amount + 1, 32).end_cell();
-;; }
+cell process_message(cell storage, int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
+    slice cs = storage.begin_parse();
+    int current_amount = cs.preload_uint(32);
+    return begin_cell().store_uint(current_amount + 1, 32).end_cell();
+}
 
-;; cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required for correct compilation
-;;     return old_storage;
-;; }
+cell migrate_one(cell old_storage) { ;; it's just a placeholder that is required for correct compilation
+    return old_storage;
+}
 
 ;; Custom version-specific code ends >>>>>
