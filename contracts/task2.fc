@@ -1,8 +1,8 @@
 ;; #include "imports/stdlib.fc";
 
-forall X -> int is_null?(X x) asm "ISNULL";
-int equal_slices(slice a, slice b) asm "SDEQ";
-() dump_str (slice str) impure asm "STRDUMP" "DROP";
+;; forall X -> int is_null?(X x) asm "ISNULL";
+int equal_slices(slice a, slice b) impure asm "SDEQ";
+;; () dump_str (slice str) impure asm "STRDUMP" "DROP";
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
     var cs = get_data().begin_parse();
@@ -45,7 +45,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         );
 
     } elseif (op == 0x068530b3) {
-        throw_if(122, is_null?(users));
+        throw_if(122, dict_empty?(users));
         int total_share = 0;
         int key = -1;
         do {
@@ -70,7 +70,7 @@ int equal_slices(slice a, slice b) asm "SDEQ";
         } until (~ f);
 
     } elseif (op == 0x7362d09c) {
-        throw_if(122, is_null?(users));
+        throw_if(122, dict_empty?(users));
         int query_id = in_msg_body~load_uint(64);
         int amount = in_msg_body~load_coins();
 
