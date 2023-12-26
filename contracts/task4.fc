@@ -83,13 +83,13 @@ forall X -> int is_null?(X x) asm "ISNULL";
     ]);
     int flatten_end = to_flatten(ei, ej, m);
     int key_len = 10;
-    cell memo = new_dict();
-    cell queue = new_dict();
     builder emptyb = begin_cell();
-    queue~udict_set_builder(40, to_key(0,0,0,to_flatten(si,sj,m)), emptyb);
+    cell memo = new_dict();
+    memo~udict_set_builder(key_len, to_flatten(si, sj, m), begin_cell().store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len));
 
     int f = 0;
-    memo~udict_set_builder(key_len, to_flatten(si, sj, m), begin_cell().store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len));
+    cell queue = new_dict();
+    queue~udict_set_builder(40, to_key(0,0,0,to_flatten(si,sj,m)), emptyb);
     do {
         (int key, slice cs, int f) = queue~udict::delete_get_min::custom(40);
         ;; int nxt_pos = cs~load_uint(10);

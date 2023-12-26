@@ -62,7 +62,6 @@
             .end_cell()
         );
         return ();
-
     }
     if (op == 0x068530b3) {  ;; SPLIT TON
         var cs = get_data().begin_parse();
@@ -93,7 +92,9 @@
                 .end_cell(), 1);
             }
         } until (~ f);
-        return ();
+        commit();  ;; cuz no need
+        throw(0);  ;; to update storage
+        ;; return ();
     }
     if (op == 0x7362d09c) {  ;; JETTON TRANSFER
         var cs = get_data().begin_parse();
@@ -143,7 +144,9 @@
                 .end_cell(), 1);
             }
         } until (~ f);
-        return ();
+        commit();
+        throw(0);
+        ;; return ();
     }
 }
 

@@ -32,7 +32,7 @@
             .store_uint(new_seqno, 32)
             .end_cell()
         );
-        commit();
+        ;; commit();
     } elseif (op == 0xbb4be234) {
         var cs = get_data().begin_parse().skip_bits(256);
         var (execution_time, receiver) = (cs~load_uint(32), cs~load_msg_addr());
