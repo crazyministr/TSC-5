@@ -6,12 +6,12 @@
 
 ;; 2 <= N <= 31 & 2 <= M <= 31
 ;; 
+;; The main idea: dijkstra with priority queue
+;;
 ;;             min (X)       min (Q)   min (L)
 ;; sort by: (X to break, ? on the way, length)
-;; dfs with memo: memo[i][j] = (X, Q, L, step back): best result to reach (i, j)
+;; memo: memo[i][j] = (X, Q, L, step back): best result to reach (i, j)
 
-
-;; global cell memo;  ;; {flatten ind: (X, Q, L, sb)} flatten_ind: 10bit; X,Q,L,sb: 10bit each one
 
 int to_flatten(int i, int j, int m) inline {
     return m * i + j;
@@ -22,20 +22,20 @@ int to_flatten(int i, int j, int m) inline {
     return (r, x - r * m);
 }
 
-int to_key(int x, int q, int l, int pos) inline {
-    return (x << 30) | (q << 20) | (l << 10) | pos;
-}
+;; int to_key(int x, int q, int l, int pos) inline {
+;;     return (x << 30) | (q << 20) | (l << 10) | pos;
+;; }
 
-(int, int, int, int) from_key(int key) inline {
-    int pos = key & ((1 << 10) - 1);
-    key >>= 10; 
-    int bl = key & ((1 << 10) - 1);
-    key >>= 10;
-    int bq = key & ((1 << 10) - 1);
-    key >>= 10;
-    int bx = key;
-    return (bx, bq, bl, pos);
-}
+;; (int, int, int, int) from_key(int key) inline {
+;;     int pos = key & ((1 << 10) - 1);
+;;     key >>= 10; 
+;;     int bl = key & ((1 << 10) - 1);
+;;     key >>= 10;
+;;     int bq = key & ((1 << 10) - 1);
+;;     key >>= 10;
+;;     int bx = key;
+;;     return (bx, bq, bl, pos);
+;; }
 
 ;; S = 83
 ;; X = 88
@@ -69,7 +69,6 @@ forall X -> int is_null?(X x) asm "ISNULL";
         i += 1;
     }
     tuple d = to_tuple([
-
         to_tuple([-1, -1]),
         to_tuple([-1,  0]),
         to_tuple([-1,  1]),
@@ -81,52 +80,49 @@ forall X -> int is_null?(X x) asm "ISNULL";
         to_tuple([ 1,  0]),
         to_tuple([ 1,  1])
     ]);
-    int flatten_end = to_flatten(ei, ej, m);
-    int key_len = 10;
+
     builder emptyb = begin_cell();
     cell memo = new_dict();
-    memo~udict_set_builder(key_len, to_flatten(si, sj, m), begin_cell().store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len).store_uint(0, key_len));
+    memo~udict_set_builder(10, to_flatten(si, sj, m), begin_cell().store_uint(0, 40));
 
     int f = 0;
     cell queue = new_dict();
-    queue~udict_set_builder(40, to_key(0,0,0,to_flatten(si,sj,m)), emptyb);
+    queue~udict_set_builder(40, to_flatten(si,sj,m), emptyb);  ;; same as to_key(0, 0, 0, flatten_start)
     do {
-        (int key, slice cs, int f) = queue~udict::delete_get_min::custom(40);
-        ;; int nxt_pos = cs~load_uint(10);
-        (int X, int Q, int L, int nxt_pos) = from_key(key);
+        ;; (int key, slice cs, int f) = queue~udict::delete_get_min::custom(40);
+        ;; (int X, int Q, int L, int nxt_pos) = from_key(key);
+
+        (int X, slice cs, int f) = queue~udict::delete_get_min::custom(40);
+        int nxt_pos = X & ((1 << 10) - 1); X >>= 10; 
+        int L = X & ((1 << 10) - 1); X >>= 10;
+        int Q = X & ((1 << 10) - 1); X >>= 10;
+        ;; int X = key;
 
         (int i, int j) = from_flatten(nxt_pos, m);
-        ;; dump_str("nxt (i, j):");
-        ;; i~dump(); j~dump();
 
         (int nX, int nQ, int nL) = (X, Q, L);
         int dit = 0;
         repeat (8) {
             tuple dd = d.at(dit);
             (int dx, int dy) = (dd.at(0), dd.at(1));
-
-            dx += i;
-            dy += j;
+            dx += i; dy += j;
             if ((dx >= 0) & (dx < n) & (dy >= 0) & (dy < m)) {
                 int char = maze.at(dx).at(dy);
                 (X, Q, L) = (nX, nQ, nL);
                 if (char == 88) { X += 1; } elseif (char == 63) { Q += 1; } L += 1;
                 int flatten_pos = to_flatten(dx, dy, m);
-                int new_key = to_key(X, Q, L, flatten_pos);
-                (slice cs, int f) = memo.udict_get?(key_len, flatten_pos);
+
+                int sub_key = (X << 20) | (Q << 10) | L;
+                int new_key = (sub_key << 10) | flatten_pos;  ;; same as to_key(X, Q, L, flatten_pos)
+
+                (slice cs, int f) = memo.udict_get?(10, flatten_pos);
                 if (~ f) {
-                    ;; dump_str("set to memo/queue nxt (dx, dy):");
-                    ;; dx~dump(); dy~dump();  new_key~dump();
-                    memo~udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(nxt_pos, key_len));
+                    memo~udict_set_builder(10, flatten_pos, begin_cell().store_uint(sub_key, 30).store_uint(nxt_pos, 10));
                     queue~udict_set_builder(40, new_key, emptyb);
                 } else {
-                    (int xX, int qQ, int lL) = (cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len));
-                    int old_key = to_key(xX, qQ, lL, flatten_pos);
+                    int old_key = (cs.preload_uint(30) << 10) | flatten_pos;
                     if (new_key < old_key) {
-                        ;; dump_str("update memo/queue nxt (dx, dy):");
-                        ;; dx~dump(); dy~dump(); new_key~dump();
-
-                        memo~udict_set_builder(key_len, flatten_pos, begin_cell().store_uint(X, key_len).store_uint(Q, key_len).store_uint(L, key_len).store_uint(nxt_pos, key_len));
+                        memo~udict_set_builder(10, flatten_pos, begin_cell().store_uint(sub_key, 30).store_uint(nxt_pos, 10));
                         queue~udict_set_builder(40, new_key, emptyb);
                     }
                 }
@@ -135,15 +131,15 @@ forall X -> int is_null?(X x) asm "ISNULL";
         }
     } until (is_null?(queue));
 
-    (slice cs, int f) = memo.udict_get?(key_len, flatten_end);
-    (int X, int Q, int L, int sb) = (cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len), cs~load_uint(key_len));
+    (slice cs, int f) = memo.udict_get?(10, to_flatten(ei, ej, m));
+    (int X, int Q, int L, int sb) = (cs~load_uint(10), cs~load_uint(10), cs~load_uint(10), cs.preload_uint(10));
 
     cell cells_to_mark = new_dict();
     repeat (L - 1) {
-        cells_to_mark~udict_set_builder(key_len, sb, emptyb);
-        (cs, _) = memo.udict_get?(key_len, sb);
-        cs~skip_bits(key_len * 3);
-        sb = cs~load_uint(key_len);
+        cells_to_mark~udict_set_builder(10, sb, emptyb);
+        (cs, _) = memo.udict_get?(10, sb);
+        cs~skip_bits(30);
+        sb = cs~load_uint(10);
     }
 
     tuple new_maze = empty_tuple();
@@ -152,25 +148,17 @@ forall X -> int is_null?(X x) asm "ISNULL";
         int j = 0;
         tuple row = empty_tuple();
         repeat (m) {
-            (_, int f) = cells_to_mark.udict_get?(key_len, to_flatten(i, j, m));
+            (_, int f) = cells_to_mark.udict_get?(10, to_flatten(i, j, m));
             if (f) {
                 row~tpush(33);
-                ;; int x = 33;
-                ;; x~dump();
             } else {
                 row~tpush(maze.at(i).at(j));
-                ;; int x = maze.at(i).at(j);
-                ;; x~dump();
             }
             j += 1;
         }
-        ;; dump_str("----");
         new_maze~tpush(row);
         i += 1;
     }
 
-    ;; X~dump();
-    ;; Q~dump();
-    ;; L~dump();
     return (X, Q, L, new_maze);
 }
