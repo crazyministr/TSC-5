@@ -39,11 +39,11 @@ int version() method_id {
     int current_version = get_current_version();
     throw_unless(200, expected_version >= current_version);
 
-    int need_update = (expected_version > current_version);
-    if (need_update) {
+    if (expected_version > current_version) {  ;; need update
         throw_if(200, is_null?(new_code));
         accept_message();
         set_code(new_code);
+        set_c3(new_code.begin_parse().bless());
     }
 
     cell storage = get_storage();
