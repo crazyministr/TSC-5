@@ -55,13 +55,15 @@ int version() method_id {
                 int new_version = cs~load_uint(32);
                 if (new_version > current_version) {
                     throw_if(400, (prev_version != -1) & (key != prev_version + 1));
-                    cell migration_code = cs.preload_maybe_ref();
-                    throw_if(400, (prev_version == -1) & (key != current_version));
-                    if (~ is_null?(migration_code)) {
-                        set_c3(migration_code.begin_parse().bless());
-                        storage = migrate_one(storage);
+                    if (cs.slice_bits()) {
+                        cell migration_code = cs.preload_maybe_ref();
+                        throw_if(400, (prev_version == -1) & (key != current_version));
+                        if (~ is_null?(migration_code)) {
+                            set_c3(migration_code.begin_parse().bless());
+                            storage = migrate_one(storage);
+                        }
+                        prev_version = new_version;
                     }
-                    prev_version = new_version;
                 }
             }
         } until (~ f);
