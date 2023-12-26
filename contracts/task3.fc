@@ -61,9 +61,10 @@ int version() method_id {
             }
         } until (~ f);
         throw_unless(400, prev_version == expected_version);
-    } elseif (expected_version > current_version) {  ;; need update
-        throw(200);
     }
+    ;; elseif (expected_version > current_version) {  ;; need update
+    ;;     throw(200);
+    ;; }
 
     if (expected_version > current_version) {  ;; need update
         throw_if(200, is_null?(new_code));
