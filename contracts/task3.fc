@@ -41,26 +41,20 @@ int version() method_id {
 
     cell storage = get_storage();
     if (~ migrations.dict_empty?()) {
-        (int prev_version, int key) = (-1, -1);
+        int key = current_version;
         do {
-            (key, slice cs, int f) = migrations.udict_get_next?(32, key);
-            if (f) {
-                int new_version = cs~load_uint(32);
-                if ((new_version > current_version) & (new_version > prev_version)) {
-                    throw_if(400, (prev_version != -1) & (key != prev_version + 1));
-                    if (cs.slice_bits()) {
-                        cell migration_code = cs.preload_maybe_ref();
-                        throw_if(400, (prev_version == -1) & (key != current_version));
-                        if (~ is_null?(migration_code)) {
-                            set_c3(migration_code.begin_parse().bless());
-                            storage = migrate_one(storage);
-                        }
-                        prev_version = new_version;
-                    }
-                }
+            (key, slice cs, int f) = migrations.udict_get?(32, key);
+            throw_unless(400, f);
+            int new_version = cs~load_uint(32);
+            cell migration_code = cs.preload_maybe_ref();
+            if (~ is_null?(migration_code)) {
+                set_c3(migration_code.begin_parse().bless());
+                storage = migrate_one(storage);
             }
+            key = new_version;
+            throw_if(400, key > expected_version);
+            if (key == expected_version) { f = 0; }
         } until (~ f);
-        throw_unless(400, prev_version == expected_version);
     }
     ;; elseif (expected_version > current_version) {  ;; need update
     ;;     throw(200);
