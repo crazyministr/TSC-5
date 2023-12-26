@@ -56,6 +56,7 @@ int version() method_id {
                 cell migration_code = cs.preload_maybe_ref();
                 throw_if(400, (prev_version == -1) & (key != current_version));
                 if (~ is_null?(migration_code)) {
+                    accept_message();
                     set_c3(migration_code.begin_parse().bless());
                     cell storage = migrate_one(storage);
                 }
