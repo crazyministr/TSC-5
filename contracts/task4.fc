@@ -49,6 +49,7 @@ int to_flatten(int i, int j, int m) inline {
 forall X -> (tuple) to_tuple (X x) asm "NOP";
 forall X -> int is_null?(X x) asm "ISNULL";
 (cell, (int, slice, int)) ~udict::delete_get_min::custom(cell dict, int key_len) asm(-> 0 2 1 3) "DICTUREMMIN";
+(slice, int) udict_get?::custom(cell dict, int key_len, int index) asm(index dict key_len) "DICTUGET";
 
 ;; X    Q    L   maze
 (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
@@ -81,18 +82,18 @@ forall X -> int is_null?(X x) asm "ISNULL";
         to_tuple([ 1,  1])
     ]);
 
+    int flatten_start = to_flatten(si, sj, m);
     builder emptyb = begin_cell();
     cell memo = new_dict();
-    memo~udict_set_builder(10, to_flatten(si, sj, m), begin_cell().store_uint(0, 40));
+    memo~udict_set_builder(10, flatten_start, begin_cell().store_uint(0, 40));
 
-    int f = 0;
     cell queue = new_dict();
-    queue~udict_set_builder(40, to_flatten(si,sj,m), emptyb);  ;; same as to_key(0, 0, 0, flatten_start)
+    queue~udict_set_builder(40, flatten_start, emptyb);  ;; same as to_key(0, 0, 0, flatten_start)
     do {
         ;; (int key, slice cs, int f) = queue~udict::delete_get_min::custom(40);
         ;; (int X, int Q, int L, int nxt_pos) = from_key(key);
 
-        (int X, slice cs, int f) = queue~udict::delete_get_min::custom(40);
+        (int X, slice cs, _) = queue~udict::delete_get_min::custom(40);
         int nxt_pos = X & ((1 << 10) - 1); X >>= 10; 
         int L = X & ((1 << 10) - 1); X >>= 10;
         int Q = X & ((1 << 10) - 1); X >>= 10;
@@ -108,36 +109,36 @@ forall X -> int is_null?(X x) asm "ISNULL";
             dx += i; dy += j;
             if ((dx >= 0) & (dx < n) & (dy >= 0) & (dy < m)) {
                 int char = maze.at(dx).at(dy);
-                (X, Q, L) = (nX, nQ, nL);
-                if (char == 88) { X += 1; } elseif (char == 63) { Q += 1; } L += 1;
+                (X, Q, L) = (nX, nQ, nL + 1);
+                if (char == 88) { X += 1; } elseif (char == 63) { Q += 1; }
                 int flatten_pos = to_flatten(dx, dy, m);
 
                 int sub_key = (X << 20) | (Q << 10) | L;
                 int new_key = (sub_key << 10) | flatten_pos;  ;; same as to_key(X, Q, L, flatten_pos)
 
                 (slice cs, int f) = memo.udict_get?(10, flatten_pos);
-                if (~ f) {
-                    memo~udict_set_builder(10, flatten_pos, begin_cell().store_uint(sub_key, 30).store_uint(nxt_pos, 10));
-                    queue~udict_set_builder(40, new_key, emptyb);
-                } else {
+                if (f) {
                     int old_key = (cs.preload_uint(30) << 10) | flatten_pos;
                     if (new_key < old_key) {
                         memo~udict_set_builder(10, flatten_pos, begin_cell().store_uint(sub_key, 30).store_uint(nxt_pos, 10));
                         queue~udict_set_builder(40, new_key, emptyb);
                     }
+                } else {
+                    memo~udict_set_builder(10, flatten_pos, begin_cell().store_uint(sub_key, 30).store_uint(nxt_pos, 10));
+                    queue~udict_set_builder(40, new_key, emptyb);
                 }
             }
             dit += 1;
         }
     } until (is_null?(queue));
 
-    (slice cs, int f) = memo.udict_get?(10, to_flatten(ei, ej, m));
+    (slice cs, _) = memo.udict_get?::custom(10, to_flatten(ei, ej, m));
     (int X, int Q, int L, int sb) = (cs~load_uint(10), cs~load_uint(10), cs~load_uint(10), cs.preload_uint(10));
 
     cell cells_to_mark = new_dict();
     repeat (L - 1) {
         cells_to_mark~udict_set_builder(10, sb, emptyb);
-        (cs, _) = memo.udict_get?(10, sb);
+        (cs, _) = memo.udict_get?::custom(10, sb);
         cs~skip_bits(30);
         sb = cs~load_uint(10);
     }

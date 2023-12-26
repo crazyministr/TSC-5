@@ -40,14 +40,14 @@ int version() method_id {
     ;; throw_unless(200, expected_version >= current_version);
 
     cell storage = get_storage();
-    if (~ migrations.dict_empty?()) {
+    ifnot (migrations.dict_empty?()) {
         int key = current_version;
         do {
             (slice cs, int f) = migrations.udict_get?(32, key);
             throw_unless(400, f);
             int new_version = cs~load_uint(32);
             cell migration_code = cs.preload_maybe_ref();
-            if (~ is_null?(migration_code)) {
+            ifnot (is_null?(migration_code)) {
                 set_c3(migration_code.begin_parse().bless());
                 storage = migrate_one(storage);
             }
