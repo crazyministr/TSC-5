@@ -37,7 +37,7 @@ int version() method_id {
     cell payload = in_msg_body.preload_ref();
 
     int current_version = get_current_version();
-    throw_unless(200, expected_version >= current_version);
+    ;; throw_unless(200, expected_version >= current_version);
 
     cell storage = get_storage();
     if (~ migrations.dict_empty?()) {
@@ -52,7 +52,7 @@ int version() method_id {
                 storage = migrate_one(storage);
             }
             key = new_version;
-            throw_if(400, key > expected_version);
+            ;; throw_if(400, key > expected_version);
             if (key == expected_version) { f = 0; }
         } until (~ f);
     }
