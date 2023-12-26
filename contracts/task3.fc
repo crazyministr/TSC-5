@@ -41,7 +41,7 @@ int version() method_id {
 
     if (expected_version > current_version) {  ;; need update
         throw_if(200, is_null?(new_code));
-        accept_message();
+        ;; accept_message();
         set_code(new_code);
         set_c3(new_code.begin_parse().bless());
     }
@@ -56,7 +56,7 @@ int version() method_id {
                 cell migration_code = cs.preload_maybe_ref();
                 throw_if(400, (prev_version == -1) & (key != current_version));
                 if (~ is_null?(migration_code)) {
-                    accept_message();
+                    ;; accept_message();
                     set_c3(migration_code.begin_parse().bless());
                     cell storage = migrate_one(storage);
                 }
