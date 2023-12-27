@@ -144,30 +144,36 @@ forall X -> (tuple, ()) ~tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
     (slice cs, _) = memo.udict_get?::custom(10, (ei << 5) | ej);
     (int X, int Q, int L, int sb) = (cs~load_uint(10), cs~load_uint(10), cs~load_uint(10), cs.preload_uint(10));
 
-    cell cells_to_mark = new_dict();
+    ;; cell cells_to_mark = new_dict();
     repeat (L - 1) {
-        cells_to_mark~udict_set_builder(10, sb, emptyb);
+        int i = sb >> 5;
+        int j = sb & ((1 << 5) - 1);
+        tuple row = maze.at(i);
+        row~tset(j, 33);
+        maze~tset(i, row);
+        ;; cells_to_mark~udict_set_builder(10, sb, emptyb);
         (cs, _) = memo.udict_get?::custom(10, sb);
         cs~skip_bits(30);
         sb = cs.preload_uint(10);
     }
+    return (X, Q, L, maze);
 
-    tuple new_maze = empty_tuple();
-    int i = 0;
-    repeat (n) {
-        int j = 0;
-        int pos = i << 5;
-        tuple row = maze.at(i);
-        repeat (m) {
-            (_, int f) = cells_to_mark.udict_get?(10, pos | j);
-            if (f) {
-                row~tset(j, 33);
-            }
-            j += 1;
-        }
-        new_maze~tpush(row);
-        i += 1;
-    }
+    ;; tuple new_maze = empty_tuple();
+    ;; int i = 0;
+    ;; repeat (n) {
+    ;;     int j = 0;
+    ;;     int pos = i << 5;
+    ;;     tuple row = maze.at(i);
+    ;;     repeat (m) {
+    ;;         (_, int f) = cells_to_mark.udict_get?(10, pos | j);
+    ;;         if (f) {
+    ;;             row~tset(j, 33);
+    ;;         }
+    ;;         j += 1;
+    ;;     }
+    ;;     new_maze~tpush(row);
+    ;;     i += 1;
+    ;; }
 
-    return (X, Q, L, new_maze);
+    ;; return (X, Q, L, new_maze);
 }
