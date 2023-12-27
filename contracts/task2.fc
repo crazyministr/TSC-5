@@ -95,7 +95,7 @@
             }
         } until (~ f);
         commit();  ;; cuz no need
-        throw(0);  ;; to update
+        throw(0);  ;; to update storage
         ;; return ();
     }
     if (op == 0x7362d09c) {  ;; JETTON TRANSFER
