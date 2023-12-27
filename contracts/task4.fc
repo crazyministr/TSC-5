@@ -61,8 +61,9 @@ forall X -> int is_null?(X x) asm "ISNULL";
     int i = 0;
     repeat (n) {
         int j = 0;
+        tuple row = maze.at(i);
         repeat (m) {
-            int char = maze.at(i).at(j);
+            int char = row.at(j);
             if (char == 83) {
                 (si, sj) = (i, j);
             } elseif (char == 69) {
@@ -73,17 +74,16 @@ forall X -> int is_null?(X x) asm "ISNULL";
         i += 1;
     }
     tuple d = to_tuple([
-        to_tuple([ 1, -1]),
-        to_tuple([ 1,  0]),
-        to_tuple([ 1,  1]),
-
         to_tuple([-1, -1]),
         to_tuple([-1,  0]),
         to_tuple([-1,  1]),
 
         to_tuple([ 0, -1]),
-        to_tuple([ 0,  1])
+        to_tuple([ 0,  1]),
 
+        to_tuple([ 1, -1]),
+        to_tuple([ 1,  0]),
+        to_tuple([ 1,  1])
     ]);
 
     int flatten_start = (si << 5) | sj; ;; to_flatten(si, sj, m);
@@ -157,12 +157,13 @@ forall X -> int is_null?(X x) asm "ISNULL";
         int j = 0;
         tuple row = empty_tuple();
         int pos = i << 5;
+        tuple old_row = maze.at(i);
         repeat (m) {
             (_, int f) = cells_to_mark.udict_get?(10, pos | j);
             if (f) {
                 row~tpush(33);
             } else {
-                row~tpush(maze.at(i).at(j));
+                row~tpush(old_row.at(j));
             }
             j += 1;
         }
