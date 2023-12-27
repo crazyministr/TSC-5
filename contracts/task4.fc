@@ -86,15 +86,18 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                 int sub_key = current_key;
 
                 sub_key += 1;  ;; L + 1
-                if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
-                int flatten_pos = (dx << 5) | dy;
+                if (char == 88) {
+                    sub_key += 1 << 20;  ;; X += 1
+                } elseif (char == 63) {
+                    sub_key += 1 << 10;  ;; Q += 1
+                }
 
                 tuple dx_row = memo.at(dx);
                 int old_key = dx_row.at(dy) >> 10;
                 if (sub_key < old_key) {
                     dx_row~tset(dy, (sub_key << 10) | nxt_pos);
                     memo~tset(dx, dx_row);
-                    queue~udict_set_builder(40, (sub_key << 10) | flatten_pos, emptyb);
+                    queue~udict_set_builder(40, (sub_key << 10) | (dx << 5) | dy, emptyb);
                 }
             }
             dit += 1;
