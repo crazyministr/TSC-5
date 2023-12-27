@@ -26,18 +26,19 @@ int version() method_id {
     }
 
     int expected_version = in_msg_body~load_uint(32);  ;; expected version
-    if (expected_version == 0) {
+    ifnot (expected_version) {
         cell default_storage = get_data();
         set_data(wrap_storage(1, default_storage));
         return ();
     }
 
+    cell new_code = in_msg_body~load_maybe_ref(); ;; expected code
+    cell migrations = in_msg_body~load_dict(); ;; migrations
+
     int current_version = get_data().begin_parse().preload_uint(32);
     ;; throw_unless(200, expected_version >= current_version);
 
-    cell new_code = in_msg_body~load_maybe_ref(); ;; expected code
     cell storage = get_storage();
-    cell migrations = in_msg_body~load_dict();
     ifnot (migrations.dict_empty?()) {
         int key = current_version;
         do {
