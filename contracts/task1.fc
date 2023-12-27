@@ -8,7 +8,7 @@
     int op = in_msg~load_uint(32);
     if (op == 0x9df10277) {
         in_msg~skip_bits(64);
-        var signature = in_msg~load_bits(512);
+        ;; var signature = in_msg~load_bits(512);
         var data_cell = in_msg.preload_ref();
         slice data_cs = data_cell.begin_parse();
         var (locked_for, new_seqno) = (data_cs~load_uint(32), data_cs.preload_uint(32));
@@ -17,7 +17,7 @@
         var (public_key, execution_time, receiver, seqno) = (ds~load_uint(256), ds~load_uint(32), ds~load_msg_addr(), ds.preload_uint(32));
 
         throw_unless(119, new_seqno == seqno + 1);
-        throw_unless(120, check_signature(data_cell.cell_hash(), signature, public_key));
+        throw_unless(120, check_signature(data_cell.cell_hash(), in_msg.preload_bits(512), public_key));
         throw_unless(121, locked_for > 0);
         int _now = now();
         throw_if(122, execution_time < _now);
