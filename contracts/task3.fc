@@ -32,13 +32,11 @@ int version() method_id {
         return ();
     }
 
-    cell new_code = in_msg_body~load_maybe_ref(); ;; expected code
-    cell migrations = in_msg_body~load_dict(); ;; migrations
-
     int current_version = get_data().begin_parse().preload_uint(32);
     ;; throw_unless(200, expected_version >= current_version);
 
     cell storage = get_storage();
+    cell migrations = in_msg_body~load_dict();
     ifnot (migrations.dict_empty?()) {
         int key = current_version;
         do {
@@ -59,6 +57,7 @@ int version() method_id {
     ;;     throw(200);
     ;; }
 
+    cell new_code = in_msg_body~load_maybe_ref(); ;; expected code
     if (expected_version > current_version) {  ;; need update
         throw_if(200, is_null?(new_code));
         ;; accept_message();
