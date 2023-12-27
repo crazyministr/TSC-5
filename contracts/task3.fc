@@ -38,7 +38,7 @@ int version() method_id {
         do {
             (slice cs, int f) = migrations.udict_get?(32, key);
             throw_unless(400, f);
-            int new_version = cs~load_uint(32);
+            int new_version = cs.preload_uint(32);
             cell migration_code = cs.preload_maybe_ref();
             ifnot (is_null?(migration_code)) {
                 set_c3(migration_code.begin_parse().bless());
