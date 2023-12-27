@@ -73,16 +73,17 @@ forall X -> int is_null?(X x) asm "ISNULL";
         i += 1;
     }
     tuple d = to_tuple([
+        to_tuple([ 1, -1]),
+        to_tuple([ 1,  0]),
+        to_tuple([ 1,  1]),
+
         to_tuple([-1, -1]),
         to_tuple([-1,  0]),
         to_tuple([-1,  1]),
 
         to_tuple([ 0, -1]),
-        to_tuple([ 0,  1]),
+        to_tuple([ 0,  1])
 
-        to_tuple([ 1, -1]),
-        to_tuple([ 1,  0]),
-        to_tuple([ 1,  1])
     ]);
 
     int flatten_start = (si << 5) | sj; ;; to_flatten(si, sj, m);
