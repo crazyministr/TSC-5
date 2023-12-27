@@ -1,9 +1,9 @@
 forall X -> int is_null?(X x) asm "ISNULL";
 
 
-int get_current_version() {
-    return get_data().begin_parse().preload_uint(32);
-}
+;; int get_current_version() {
+;;     return get_data().begin_parse().preload_uint(32);
+;; }
 
 cell get_storage() {
     return get_data().begin_parse().preload_ref();
@@ -17,7 +17,7 @@ cell wrap_storage(int version_id, cell storage) {
 }
 
 int version() method_id {
-    return get_current_version();
+    return get_data().begin_parse().preload_uint(32);
 }
 
 () recv_internal(int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
@@ -34,9 +34,8 @@ int version() method_id {
 
     cell new_code = in_msg_body~load_maybe_ref(); ;; expected code
     cell migrations = in_msg_body~load_dict(); ;; migrations
-    cell payload = in_msg_body.preload_ref();
 
-    int current_version = get_current_version();
+    int current_version = get_data().begin_parse().preload_uint(32);
     ;; throw_unless(200, expected_version >= current_version);
 
     cell storage = get_storage();
@@ -67,6 +66,7 @@ int version() method_id {
         set_c3(new_code.begin_parse().bless());
     }
 
+    cell payload = in_msg_body.preload_ref();
     storage = process_message(storage, msg_value, balance, in_msg_full, payload.begin_parse());
     set_data(wrap_storage(expected_version, storage));
 }
