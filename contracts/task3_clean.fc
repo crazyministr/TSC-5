@@ -1,5 +1,10 @@
 forall X -> int is_null?(X x) asm "ISNULL";
 
+
+;; int get_current_version() {
+;;     return get_data().begin_parse().preload_uint(32);
+;; }
+
 cell get_storage() {
     return get_data().begin_parse().preload_ref();
 }
@@ -22,7 +27,8 @@ int version() method_id {
 
     int expected_version = in_msg_body~load_uint(32);  ;; expected version
     ifnot (expected_version) {
-        set_data(begin_cell().store_uint(1, 32).store_ref(get_data()).end_cell());
+        cell default_storage = get_data();
+        set_data(wrap_storage(1, default_storage));
         return ();
     }
 
@@ -32,7 +38,7 @@ int version() method_id {
     int current_version = get_data().begin_parse().preload_uint(32);
     ;; throw_unless(200, expected_version >= current_version);
 
-    cell storage = get_data().begin_parse().preload_ref();
+    cell storage = get_storage();
     ifnot (migrations.dict_empty?()) {
         int key = current_version;
         do {
@@ -49,16 +55,20 @@ int version() method_id {
             if (key == expected_version) { f = 0; }
         } until (~ f);
     }
+    ;; elseif (expected_version > current_version) {  ;; need update
+    ;;     throw(200);
+    ;; }
 
     if (expected_version > current_version) {  ;; need update
         throw_if(200, is_null?(new_code));
+        ;; accept_message();
         set_code(new_code);
         set_c3(new_code.begin_parse().bless());
     }
 
     cell payload = in_msg_body.preload_ref();
     storage = process_message(storage, msg_value, balance, in_msg_full, payload.begin_parse());
-    set_data(begin_cell().store_uint(expected_version, 32).store_ref(storage).end_cell());
+    set_data(wrap_storage(expected_version, storage));
 }
 
 ;; <<<<< Custom version-specific code begins

@@ -113,9 +113,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
     repeat (L - 1) {
         int i = sb >> 5;
         int j = sb & ((1 << 5) - 1);
-        tuple row = maze.at(i);
-        row~tset(j, 33);
-        maze~tset(i, row);
+        maze~tset(i, tuples::tset(maze.at(i), j, 33));  ;; maze[i][j] = 33
 
         int key = memo.at(i).at(j);
         sb = key & ((1 << 10) - 1);
