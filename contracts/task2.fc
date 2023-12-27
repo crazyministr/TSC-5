@@ -82,7 +82,7 @@
 
         (slice cs, int f) = users~udict_delete_get?(256, user_id);
         throw_unless(121, f);
-        total_share -= cs.preload_uint(41);
+        total_share -= cs.preload_uint(32);
         set_data(
             begin_cell()
                 .store_slice(admin)
