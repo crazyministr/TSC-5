@@ -86,10 +86,10 @@ forall X -> int is_null?(X x) asm "ISNULL";
     ]);
 
     int flatten_start = (si << 5) | sj; ;; to_flatten(si, sj, m);
+    builder emptyb = begin_cell();
     cell memo = new_dict();
     memo~udict_set_builder(10, flatten_start, begin_cell().store_uint(0, 40));
 
-    builder emptyb = begin_cell();
     cell queue = new_dict();
     queue~udict_set_builder(40, flatten_start, emptyb);  ;; same as to_key(0, 0, 0, flatten_start)
     do {
@@ -97,30 +97,28 @@ forall X -> int is_null?(X x) asm "ISNULL";
         ;; (int X, int Q, int L, int nxt_pos) = from_key(key);
 
         (int X, slice cs, _) = queue~udict::delete_get_min::custom(40);
-        int nxt_pos = X & ((1 << 10) - 1); X >>= 10;
-        ;; int L = X & ((1 << 10) - 1); X >>= 10;
-        ;; int Q = X & ((1 << 10) - 1); X >>= 10;
+        int nxt_pos = X & ((1 << 10) - 1); X >>= 10; 
+        int L = X & ((1 << 10) - 1); X >>= 10;
+        int Q = X & ((1 << 10) - 1); X >>= 10;
         ;; int X = key;
 
         ;; (int i, int j) = from_flatten(nxt_pos, m);
         int i = nxt_pos >> 5;
         int j = nxt_pos & ((1 << 5) - 1);
 
-        ;; (int nX, int nQ, int nL) = (X, Q, L);
+        (int nX, int nQ, int nL) = (X, Q, L);
         int dit = 0;
         repeat (8) {
             tuple dd = d.at(dit);
-            (int dx, int dy) = (dd.at(0) + i, dd.at(1) + j);
-            ;; dx += i; dy += j;
+            (int dx, int dy) = (dd.at(0), dd.at(1));
+            dx += i; dy += j;
             if ((dx >= 0) & (dx < n) & (dy >= 0) & (dy < m)) {
                 int char = maze.at(dx).at(dy);
-                int sub_key = X;
-                ;; (X, Q, L) = (nX, nQ, nL + 1);
-                sub_key += 1;  ;; L + 1
-                if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
+                (X, Q, L) = (nX, nQ, nL + 1);
+                if (char == 88) { X += 1; } elseif (char == 63) { Q += 1; }
                 int flatten_pos = (dx << 5) | dy;  ;; to_flatten(dx, dy, m);
 
-                ;; int sub_key = (X << 20) | (Q << 10) | L;
+                int sub_key = (X << 20) | (Q << 10) | L;
                 int new_key = (sub_key << 10) | flatten_pos;  ;; same as to_key(X, Q, L, flatten_pos)
 
                 (slice cs, int f) = memo.udict_get?(10, flatten_pos);
@@ -147,7 +145,7 @@ forall X -> int is_null?(X x) asm "ISNULL";
         cells_to_mark~udict_set_builder(10, sb, emptyb);
         (cs, _) = memo.udict_get?::custom(10, sb);
         cs~skip_bits(30);
-        sb = cs.preload_uint(10);
+        sb = cs~load_uint(10);
     }
 
     tuple new_maze = empty_tuple();
@@ -155,9 +153,8 @@ forall X -> int is_null?(X x) asm "ISNULL";
     repeat (n) {
         int j = 0;
         tuple row = empty_tuple();
-        int pos = i << 5;
         repeat (m) {
-            (_, int f) = cells_to_mark.udict_get?(10, pos | j);
+            (_, int f) = cells_to_mark.udict_get?(10, (i << 5) | j);
             if (f) {
                 row~tpush(33);
             } else {
