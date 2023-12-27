@@ -53,6 +53,7 @@ forall X -> (tuple) to_tuple (X x) asm "NOP";
 forall X -> int is_null?(X x) asm "ISNULL";
 (cell, (int, slice, int)) ~udict::delete_get_min::custom(cell dict, int key_len) asm(-> 0 2 1 3) "DICTUREMMIN";
 (slice, int) udict_get?::custom(cell dict, int key_len, int index) asm(index dict key_len) "DICTUGET";
+forall X -> (tuple, ()) ~tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
 
 ;; X    Q    L   maze
 (int, int, int, tuple) solve(int n, int m, tuple maze) method_id {
@@ -155,15 +156,12 @@ forall X -> int is_null?(X x) asm "ISNULL";
     int i = 0;
     repeat (n) {
         int j = 0;
-        tuple row = empty_tuple();
         int pos = i << 5;
-        tuple old_row = maze.at(i);
+        tuple row = maze.at(i);
         repeat (m) {
             (_, int f) = cells_to_mark.udict_get?(10, pos | j);
             if (f) {
-                row~tpush(33);
-            } else {
-                row~tpush(old_row.at(j));
+                row~tset(j, 33);
             }
             j += 1;
         }
