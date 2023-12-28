@@ -39,29 +39,26 @@
     }
     if (op == 0x278205c8) {  ;; REMOVE
         slice cs = get_data().begin_parse();
-        ;; slice admin = cs~load_msg_addr();
-        int admin_prefix = cs~load_int(11);
-        int admin_hash = cs.preload_uint(256);
+        slice admin = cs~load_msg_addr();
 
         slice cs2 = in_msg_full.begin_parse();
-        cs2~skip_bits(4 + 11);
-        int sender_hash = cs2.preload_uint(256);
+        cs2~skip_bits(4);
+        slice sender = cs2~load_msg_addr();
 
-        throw_unless(120, admin_hash == sender_hash);
+        throw_unless(120, equal_slices(admin, sender));
 
         cell users = cs.preload_dict();
 
-        in_msg_body~skip_bits(64);
-        slice user_addr = in_msg_body~load_msg_addr();
-        (_, int user_id) = parse_std_addr(user_addr);
+        in_msg_body~skip_bits(64 + 11);
+        ;; slice user_addr = in_msg_body~load_msg_addr();
+        ;; (_, int user_id) = parse_std_addr(user_addr);
+        int user_id = in_msg_body.preaload_uint(256);
 
         (slice cs, int f) = users~udict_delete_get?(256, user_id);
         throw_unless(121, f);
         set_data(
             begin_cell()
-                .store_int(admin_prefix, 11)
-                .store_uint(admin_hash, 256)
-                ;; .store_slice(admin)
+                .store_slice(admin)
                 .store_dict(users)
             .end_cell()
         );
