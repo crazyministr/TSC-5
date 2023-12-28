@@ -27,7 +27,7 @@ int version() method_id {
     }
 
     cell new_code = in_msg_body~load_maybe_ref(); ;; expected code
-    cell migrations = in_msg_body.preload_dict(); ;; migrations
+    cell migrations = in_msg_body~load_dict(); ;; migrations
 
     int current_version = get_data().begin_parse().preload_uint(32);
     ;; throw_unless(200, expected_version >= current_version);
@@ -56,7 +56,6 @@ int version() method_id {
         set_c3(new_code.begin_parse().bless());
     }
 
-    in_msg_body = in_msg_body.skip_dict();
     cell payload = in_msg_body.preload_ref();
     storage = process_message(storage, msg_value, balance, in_msg_full, payload.begin_parse());
     set_data(begin_cell().store_uint(expected_version, 32).store_ref(storage).end_cell());
