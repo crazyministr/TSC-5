@@ -34,6 +34,9 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
     ;; int inf = 1099511626752;  ;; 0b1111111111 1111111111 1111111111 0000000000
     tuple memo = empty_tuple();
     tuple memo_row = empty_tuple();
+    repeat (m) {
+        memo_row~tpush(1099511626752);  ;; INF: 0b1111111111 1111111111 1111111111 0000000000
+    }
     repeat (n) {
         int j = 0;
         tuple row = maze.at(i);
@@ -43,9 +46,6 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                 (si, sj) = (i, j);
             } elseif (char == 69) {
                 (ei, ej) = (i, j);
-            }
-            ifnot (i) {
-                memo_row~tpush(1099511626752);  ;; INF: 0b1111111111 1111111111 1111111111 0000000000
             }
             j += 1;
         }
