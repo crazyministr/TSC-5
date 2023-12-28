@@ -41,7 +41,7 @@
         slice cs = get_data().begin_parse();
         ;; slice admin = cs~load_msg_addr();
         int admin_prefix = cs~load_uint(11);
-        int admin_hash = cs.preaload_uint(256);
+        int admin_hash = cs.preload_uint(256);
 
         slice cs2 = in_msg_full.begin_parse();
         cs2~skip_bits(4 + 11);
