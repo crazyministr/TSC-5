@@ -97,8 +97,9 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                 tuple dx_row = memo.at(dx);
                 int old_key = dx_row.at(dy) >> 10;
                 if (sub_key < old_key) {
-                    memo~tset(dx, tuples::tset(dx_row, dy, (sub_key << 10) | nxt_pos));  ;; memo[dx][dx] = key
-                    queue~udict_set_builder(40, (sub_key << 10) | (dx << 5) | dy, emptyb);
+                    sub_key <<= 10;
+                    queue~udict_set_builder(40, sub_key | (dx << 5) | dy, emptyb);
+                    memo~tset(dx, tuples::tset(dx_row, dy, sub_key | nxt_pos));  ;; memo[dx][dx] = key
                 }
             }
             dit += 1;
