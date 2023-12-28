@@ -132,14 +132,15 @@
                 send_raw_message(prebuild
                     .store_ref(
                         begin_cell()
-                            .store_uint((0x0f8a7ea5 << 64) | query_id, 32 + 64)
-                            ;; .store_uint(query_id, 64)
+                            .store_uint(0x0f8a7ea5, 32)
+                            .store_uint(query_id, 64)
                             .store_coins(muldiv(share, amount, total_share))
                             .store_uint(4, 3).store_int(0, 8).store_uint(key, 256)
                             .store_uint(4, 3).store_int(0, 8).store_uint(key, 256)
-                            .store_uint(0, 1)
-                            .store_coins(1)
-                            .store_uint(0, 1)
+                            ;; .store_uint(0, 1)
+                            ;; .store_coins(1)
+                            ;; .store_uint(0, 1)
+                            .store_uint(514, 14)
                         .end_cell()
                     )
                 .end_cell(), 1);
