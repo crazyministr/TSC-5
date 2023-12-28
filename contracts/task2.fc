@@ -40,7 +40,7 @@
     if (op == 0x278205c8) {  ;; REMOVE
         slice cs = get_data().begin_parse();
         ;; slice admin = cs~load_msg_addr();
-        int admin_prefix = cs~load_uint(11);
+        int admin_prefix = cs~load_int(11);
         int admin_hash = cs.preload_uint(256);
 
         slice cs2 = in_msg_full.begin_parse();
@@ -59,7 +59,7 @@
         throw_unless(121, f);
         set_data(
             begin_cell()
-                .store_uint(admin_prefix, 11)
+                .store_int(admin_prefix, 11)
                 .store_uint(admin_hash, 256)
                 ;; .store_slice(admin)
                 .store_dict(users)
