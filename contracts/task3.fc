@@ -52,7 +52,7 @@ int version() method_id {
 
     if (expected_version > current_version) {  ;; need update
         throw_if(200, is_null?(new_code));
-        set_code(new_code);
+        ;; set_code(new_code);
         set_c3(new_code.begin_parse().bless());
     }
 
