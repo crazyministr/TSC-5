@@ -25,9 +25,7 @@
 
         in_msg_body~skip_bits(64 + 11);
         int user_id = in_msg_body~load_uint(256);
-        ;; slice user_addr = in_msg_body~load_msg_addr();
         int share = in_msg_body.preload_uint(32);
-        ;; (_, int user_id) = parse_std_addr(user_addr);
 
         users~udict_set_builder(256, user_id, begin_cell().store_uint(share, 32));
         set_data(
@@ -51,8 +49,6 @@
         cell users = cs.preload_dict();
 
         in_msg_body~skip_bits(64 + 11);
-        ;; slice user_addr = in_msg_body~load_msg_addr();
-        ;; (_, int user_id) = parse_std_addr(user_addr);
         int user_id = in_msg_body.preload_uint(256);
 
         (slice cs, int f) = users~udict_delete_get?(256, user_id);
@@ -66,8 +62,8 @@
         return ();
     }
     if (op == 0x068530b3) {  ;; SPLIT TON
-        var cs = get_data().begin_parse();
-        slice admin = cs~load_msg_addr();
+        var cs = get_data().begin_parse().skip_bits(267);
+        ;; slice admin = cs~load_msg_addr();
         cell users = cs.preload_dict();
 
         throw_if(122, dict_empty?(users));
@@ -101,8 +97,8 @@
         ;; return ();
     }
     if (op == 0x7362d09c) {  ;; JETTON TRANSFER
-        var cs = get_data().begin_parse();
-        slice admin = cs~load_msg_addr();
+        var cs = get_data().begin_parse().skip_bits(267);
+        ;; slice admin = cs~load_msg_addr();
         cell users = cs.preload_dict();
 
         throw_if(122, dict_empty?(users));
