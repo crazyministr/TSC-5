@@ -40,7 +40,7 @@
 
         throw_unless(120, equal_slices(admin, sender));
 
-        cell users = cs.preload_dict();
+        cell users = cs~load_dict();
         int total_share = cs.preload_uint(41);
 
         in_msg_body~skip_bits(64);
@@ -73,7 +73,7 @@
 
         throw_unless(120, equal_slices(admin, sender));
 
-        cell users = cs.preload_dict();
+        cell users = cs~load_dict();
         int total_share = cs.preload_uint(41);
 
         in_msg_body~skip_bits(64);
@@ -95,7 +95,7 @@
     if (op == 0x068530b3) {  ;; SPLIT TON
         var cs = get_data().begin_parse();
         slice admin = cs~load_msg_addr();
-        cell users = cs.preload_dict();
+        cell users = cs~load_dict();
         int total_share = cs.preload_uint(41);
 
         throw_if(122, dict_empty?(users));
