@@ -52,7 +52,7 @@
         in_msg_body~skip_bits(64 + 11);
         ;; slice user_addr = in_msg_body~load_msg_addr();
         ;; (_, int user_id) = parse_std_addr(user_addr);
-        int user_id = in_msg_body.preaload_uint(256);
+        int user_id = in_msg_body.preload_uint(256);
 
         (slice cs, int f) = users~udict_delete_get?(256, user_id);
         throw_unless(121, f);
