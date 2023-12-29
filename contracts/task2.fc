@@ -3,6 +3,7 @@
 ;; forall X -> int is_null?(X x) asm "ISNULL";
 ;; int equal_slices(slice a, slice b) impure asm "SDEQ";
 ;; () dump_str (slice str) impure asm "STRDUMP" "DROP";
+builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
@@ -30,7 +31,7 @@
         users~udict_set_builder(256, user_id, begin_cell().store_uint(share, 32));
         set_data(
             begin_cell()
-                .store_slice(admin)
+                .custom::store_slice(admin)
                 .store_dict(users)
             .end_cell()
         );
@@ -55,7 +56,7 @@
         throw_unless(121, f);
         set_data(
             begin_cell()
-                .store_slice(admin)
+                .custom::store_slice(admin)
                 .store_dict(users)
             .end_cell()
         );
@@ -119,7 +120,7 @@
 
         builder prebuild = begin_cell()
             .store_uint(0x18, 6)
-            .store_slice(sender)
+            .custom::store_slice(sender)
             .store_coins(20000000)
             .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1);
         int key = -1;
