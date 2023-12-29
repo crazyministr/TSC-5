@@ -6,14 +6,15 @@
 builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
 ;; (cell, slice, int) udict_delete_get?::121(cell dict, int key_len, int index) asm(index dict key_len) "DICTUDELGET" "121 THROWIFNOT";
 (cell, slice) ~udict_delete_get?::121(cell dict, int key_len, int index) asm(index dict key_len) "DICTUDELGET" "121 THROWIFNOT";
+(int, slice) load_uint32_or_ret(slice s) impure asm "32 LDUQ" "IFNOTRET";
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
-    if (in_msg_body.slice_empty?()) {
-        return ();
-    }
+    ;; if (in_msg_body.slice_empty?()) {
+    ;;     return ();
+    ;; }
 
-    int op = in_msg_body~load_uint(32);
+    (int op, in_msg_body) = in_msg_body.load_uint32_or_ret();
     if (op == 0x368ddef3) {  ;; ADD
         slice cs = get_data().begin_parse();
         slice admin = cs~load_msg_addr();
@@ -41,10 +42,10 @@ builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
     }
     if (op == 0x278205c8) {  ;; REMOVE
         slice cs = get_data().begin_parse();
-        slice admin = cs.load_msg_addr();
+        slice admin = cs~load_msg_addr();
 
         slice cs2 = in_msg_full.begin_parse().skip_bits(4);
-        slice sender = cs2.load_msg_addr();
+        slice sender = cs2~load_msg_addr();
 
         throw_unless(120, equal_slices(admin, sender));
 
