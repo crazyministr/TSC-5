@@ -31,6 +31,11 @@ int version() method_id {
 
     int current_version = get_data().begin_parse().preload_uint(32);
     ;; throw_unless(200, expected_version >= current_version);
+    if (expected_version > current_version) {  ;; need update
+        throw_if(200, is_null?(new_code));
+        set_code(new_code);
+        set_c3(new_code.begin_parse().bless());
+    }
 
     cell storage = get_data().begin_parse().preload_ref();
     ifnot (migrations.dict_empty?()) {
@@ -48,12 +53,6 @@ int version() method_id {
             ;; throw_if(400, key > expected_version);
             if (key == expected_version) { f = 0; }
         } until (~ f);
-    }
-
-    if (expected_version > current_version) {  ;; need update
-        throw_if(200, is_null?(new_code));
-        set_code(new_code);
-        set_c3(new_code.begin_parse().bless());
     }
 
     cell payload = in_msg_body.preload_ref();
