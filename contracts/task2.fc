@@ -73,16 +73,13 @@ builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
         int key = -1;
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
-            int share = -1;
             if (f) {
-                share = cs.preload_uint(32);
-                total_share += share;
+                total_share += cs.preload_uint(32);
             }
-        } until (share == -1);
+        } until (~ f);
 
-        builder prebuild = begin_cell()
-            .store_uint(0x18, 6)
-            .store_uint(4, 3).store_int(0, 8);
+        ;; builder prebuild = begin_cell().store_uint(0x18, 6).store_uint(4, 3).store_int(0, 8);
+        builder prebuild = begin_cell().store_uint(50176, 6 + 3 + 8);
         int key = -1;
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
