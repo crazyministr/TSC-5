@@ -16,7 +16,7 @@ int version() method_id {
 }
 
 ;; (slice, int) udict_get?::custom(cell dict, int key_len, int index) asm(index dict key_len) "DICTUGET" "400 THROWIFNOT";
-slice udict_get::400(cell dict, int key_len, slice index) asm(index dict key_len) "DICTUGET" "400 THROWIFNOT";
+slice udict_get?::400(cell dict, int key_len, slice index) asm(index dict key_len) "DICTUGET" "400 THROWIFNOT";
 
 () recv_internal(int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
     ;; if (in_msg_body.slice_empty?()) {
@@ -39,7 +39,7 @@ slice udict_get::400(cell dict, int key_len, slice index) asm(index dict key_len
     ifnot (migrations.dict_empty?()) {
         int key = current_version;
         do {
-            slice cs = migrations.udict_get::400(32, key);
+            slice cs = migrations.udict_get?::400(32, key);
             ;; throw_unless(400, f);
             key = cs~load_uint(32);
             cell migration_code = cs.preload_maybe_ref();
