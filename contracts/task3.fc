@@ -15,7 +15,7 @@ int version() method_id {
     return get_data().begin_parse().preload_uint(32);
 }
 
-(int, cell) udict_get?::400(cell dict, int key_len, int index) asm(index dict key_len) "DICTUGET" "400 THROWIFNOT" "LDUX" "PLDOPTREF";
+(int, cell) udict_get?::400(cell dict, int key_len, int index) asm(index dict key_len) "DICTUGET" "400 THROWIFNOT" "32 LDUX" "PLDOPTREF";
 
 () recv_internal(int msg_value, int balance, cell in_msg_full, slice in_msg_body) impure {
     ;; if (in_msg_body.slice_empty?()) {
