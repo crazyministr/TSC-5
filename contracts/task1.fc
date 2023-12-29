@@ -1,5 +1,7 @@
 #include "imports/stdlib.fc";
 
+builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
+
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
 }
@@ -29,7 +31,7 @@
             begin_cell()
             .store_uint(public_key, 256)
             .store_uint(_now + locked_for, 32)
-            .store_slice(receiver)
+            .custom::store_slice(receiver)
             .store_uint(new_seqno, 32)
             .end_cell()
         );
@@ -44,7 +46,7 @@
 
         send_raw_message(begin_cell()
             .store_uint(0x18, 6)
-            .store_slice(receiver)
+            .custom::store_slice(receiver)
             ;; .store_coins(0)
             .store_uint(0, 4 + 1 + 4 + 4 + 64 + 32 + 1 + 1)
             .end_cell(), 128);
