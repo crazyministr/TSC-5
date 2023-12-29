@@ -140,4 +140,5 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
     ;;     sb = key & ((1 << 10) - 1);
     ;; }
     ;; return (X, Q, L, maze);
+    return (-1, 0, 0, null());
 }
