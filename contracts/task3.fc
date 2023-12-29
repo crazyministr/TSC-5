@@ -1,4 +1,4 @@
-forall X -> int is_null?(X x) asm "ISNULL";
+;; forall X -> int is_null?(X x) asm "ISNULL";
 
 cell get_storage() {
     return get_data().begin_parse().preload_ref();
@@ -40,18 +40,17 @@ int version() method_id {
             throw_unless(400, f);
             int new_version = cs~load_uint(32);
             cell migration_code = cs.preload_maybe_ref();
-            ifnot (is_null?(migration_code)) {
+            ifnot (cell_null?(migration_code)) {
                 set_c3(migration_code.begin_parse().bless());
                 storage = migrate_one(storage);
             }
             key = new_version;
             ;; throw_if(400, key > expected_version);
-            ;; if (key == expected_version) { f = 0; }
         } until (key == expected_version);
     }
 
     if (expected_version > current_version) {  ;; need update
-        throw_if(200, is_null?(new_code));
+        throw_if(200, cell_null?(new_code));
         set_code(new_code);
         set_c3(new_code.begin_parse().bless());
     }
