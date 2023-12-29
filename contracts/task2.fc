@@ -4,6 +4,8 @@
 ;; int equal_slices(slice a, slice b) impure asm "SDEQ";
 ;; () dump_str (slice str) impure asm "STRDUMP" "DROP";
 builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
+;; (cell, slice, int) udict_delete_get?::121(cell dict, int key_len, int index) asm(index dict key_len) "DICTUDELGET" "121 THROWIFNOT";
+(cell, slice) ~udict_delete_get?::121(cell dict, int key_len, int index) asm(index dict key_len) "DICTUDELGET" "121 THROWIFNOT";
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
@@ -52,8 +54,8 @@ builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
         in_msg_body~skip_bits(64 + 11);
         int user_id = in_msg_body.preload_uint(256);
 
-        (slice cs, int f) = users~udict_delete_get?(256, user_id);
-        throw_unless(121, f);
+        slice cs = users~udict_delete_get?::121(256, user_id);
+        ;; throw_unless(121, f);
         set_data(
             begin_cell()
                 .custom::store_slice(admin)
