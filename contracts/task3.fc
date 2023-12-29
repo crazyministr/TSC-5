@@ -39,11 +39,15 @@ int version() method_id {
             (slice cs, int f) = migrations.udict_get?(32, key);
             throw_unless(400, f);
             int new_version = cs~load_uint(32);
-            cell migration_code = cs.preload_maybe_ref();
-            ifnot (cell_null?(migration_code)) {
-                set_c3(migration_code.begin_parse().bless());
+            if (cs.preload_uint(1)) {
+                set_c3(cs.preload_ref().begin_parse().bless());
                 storage = migrate_one(storage);
             }
+            ;; cell migration_code = cs.preload_maybe_ref();
+            ;; ifnot (cell_null?(migration_code)) {
+            ;;     set_c3(migration_code.begin_parse().bless());
+            ;;     storage = migrate_one(storage);
+            ;; }
             key = new_version;
             ;; throw_if(400, key > expected_version);
         } until (key == expected_version);
