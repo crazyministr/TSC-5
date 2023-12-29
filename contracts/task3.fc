@@ -46,8 +46,8 @@ int version() method_id {
             }
             key = new_version;
             ;; throw_if(400, key > expected_version);
-            if (key == expected_version) { f = 0; }
-        } until (~ f);
+            ;; if (key == expected_version) { f = 0; }
+        } until (key == expected_version);
     }
 
     if (expected_version > current_version) {  ;; need update
