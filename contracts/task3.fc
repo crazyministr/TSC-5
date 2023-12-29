@@ -28,13 +28,13 @@ slice udict_get?::400(cell dict, int key_len, int index) asm(index dict key_len)
         return ();
     }
 
+    int current_version = get_data().begin_parse().preload_uint(32);
+    ;; throw_unless(200, expected_version >= current_version);
+    cell storage = get_data().begin_parse().preload_ref();
+
     cell new_code = in_msg_body~load_maybe_ref(); ;; expected code
     cell migrations = in_msg_body~load_dict(); ;; migrations
 
-    int current_version = get_data().begin_parse().preload_uint(32);
-    ;; throw_unless(200, expected_version >= current_version);
-
-    cell storage = get_data().begin_parse().preload_ref();
     ifnot (migrations.dict_empty?()) {
         int key = current_version;
         do {
