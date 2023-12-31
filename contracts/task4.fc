@@ -71,7 +71,8 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
     builder emptyb = begin_cell();
     cell queue = new_dict();
     queue~udict_set_builder(40, flatten_start, emptyb);
-    do {
+    repeat (1023) {
+    ;; do {
         (int current_key, slice cs, _) = queue~udict::delete_get_min::custom(40);
         int nxt_pos = current_key & ((1 << 10) - 1); current_key >>= 10;
 
@@ -123,7 +124,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
             }
             dit += 1;
         }
-    } until (is_null?(queue));
+    } ;;until (is_null?(queue));
 
     ;; int key = memo.at(ei).at(ej);
     ;; int sb = key & ((1 << 10) - 1); key >>= 10;
