@@ -104,8 +104,10 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                 }
                 if ((dx == ei) & (dy == ej)) {
 
-                    int key = memo.at(ei).at(ej);
-                    int sb = key & ((1 << 10) - 1); key >>= 10;
+                    ;; int key = memo.at(ei).at(ej);
+                    ;; int sb = key & ((1 << 10) - 1); key >>= 10;
+                    int sb = nxt_pos;
+                    int key = sub_key;
                     int  L = key & ((1 << 10) - 1); key >>= 10;
                     int  Q = key & ((1 << 10) - 1); key >>= 10;
                     int  X = key;
