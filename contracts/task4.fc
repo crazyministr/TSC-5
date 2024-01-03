@@ -84,6 +84,29 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
             tuple dd = d.at(dit);
             (int dx, int dy) = (dd.at(0) + i, dd.at(1) + j);
 
+            if ((dx == ei) & (dy == ej)) {
+                int key = current_key + 1;
+
+                ;; int key = memo.at(ei).at(ej);
+                ;; int sb = key & ((1 << 10) - 1); key >>= 10;
+                int sb = nxt_pos;
+                ;; int key = sub_key;
+                int  L = key & ((1 << 10) - 1); key >>= 10;
+                int  Q = key & ((1 << 10) - 1); key >>= 10;
+                int  X = key;
+
+                repeat (L - 1) {
+                    int i = sb >> 5;
+                    int j = sb & ((1 << 5) - 1);
+                    maze~tset(i, tuples::tset(maze.at(i), j, 33));  ;; maze[i][j] = 33
+
+                    int key = memo.at(i).at(j);
+                    sb = key & ((1 << 10) - 1);
+                }
+                return (X, Q, L, maze);
+
+            }
+
             if ((dx >= 0) & (dx < n) & (dy >= 0) & (dy < m)) {
                 int char = maze.at(dx).at(dy);
                 int sub_key = current_key;
@@ -101,27 +124,6 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                     sub_key <<= 10;
                     queue~udict_set_builder(40, sub_key | (dx << 5) | dy, emptyb);
                     memo~tset(dx, tuples::tset(dx_row, dy, sub_key | nxt_pos));  ;; memo[dx][dx] = key
-                }
-                if ((dx == ei) & (dy == ej)) {
-
-                    ;; int key = memo.at(ei).at(ej);
-                    ;; int sb = key & ((1 << 10) - 1); key >>= 10;
-                    int sb = nxt_pos;
-                    int key = sub_key;
-                    int  L = key & ((1 << 10) - 1); key >>= 10;
-                    int  Q = key & ((1 << 10) - 1); key >>= 10;
-                    int  X = key;
-
-                    repeat (L - 1) {
-                        int i = sb >> 5;
-                        int j = sb & ((1 << 5) - 1);
-                        maze~tset(i, tuples::tset(maze.at(i), j, 33));  ;; maze[i][j] = 33
-
-                        int key = memo.at(i).at(j);
-                        sb = key & ((1 << 10) - 1);
-                    }
-                    return (X, Q, L, maze);
-
                 }
             }
             dit += 1;
