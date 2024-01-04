@@ -70,7 +70,8 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
 
     builder emptyb = begin_cell();
     cell queue = new_dict();
-    queue~udict_set_builder(40, flatten_start, emptyb);
+    int hx = max(abs(si - ei), abs(sj + ej));
+    queue~udict_set_builder(40, (hx << 10) | flatten_start, emptyb);
     repeat (1023) {
     ;; do {
         (int current_key, slice cs, _) = queue~udict::delete_get_min::custom(40);
@@ -78,6 +79,8 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
 
         int i = nxt_pos >> 5;
         int j = nxt_pos & ((1 << 5) - 1);
+        ;; i~dump(); j~dump(); int xxx = 100000; xxx~dump();
+        current_key -= max(abs(i - ei), abs(j - ej));
 
         int dit = 0;
         repeat (8) {
@@ -98,16 +101,15 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                 tuple dx_row = memo.at(dx);
                 int old_key = dx_row.at(dy) >> 10;
                 if (sub_key < old_key) {
-                    sub_key <<= 10;
-                    queue~udict_set_builder(40, sub_key | (dx << 5) | dy, emptyb);
-                    memo~tset(dx, tuples::tset(dx_row, dy, sub_key | nxt_pos));  ;; memo[dx][dx] = key
+                    ;; sub_key <<= 10;
+                    int hx = max(abs(dx - ei), abs(dy - ej));
+
+                    queue~udict_set_builder(40, ((sub_key + hx) << 10) | (dx << 5) | dy, emptyb);
+                    memo~tset(dx, tuples::tset(dx_row, dy, (sub_key << 10) | nxt_pos));  ;; memo[dx][dx] = key
                 }
                 if ((dx == ei) & (dy == ej)) {
-
-                    int key = sub_key >> 10;
-                    int sb = nxt_pos;
-                    ;; int key = memo.at(ei).at(ej);
-                    ;; int sb = key & ((1 << 10) - 1); key >>= 10;
+                    int key = memo.at(ei).at(ej);
+                    int sb = key & ((1 << 10) - 1); key >>= 10;
                     int  L = key & ((1 << 10) - 1); key >>= 10;
                     int  Q = key & ((1 << 10) - 1); key >>= 10;
                     int  X = key;
