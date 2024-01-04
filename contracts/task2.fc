@@ -7,6 +7,7 @@ builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
 ;; (cell, slice, int) udict_delete_get?::121(cell dict, int key_len, int index) asm(index dict key_len) "DICTUDELGET" "121 THROWIFNOT";
 (cell, slice) ~udict_delete_get?::121(cell dict, int key_len, int index) asm(index dict key_len) "DICTUDELGET" "121 THROWIFNOT";
 (int, slice) load_uint32_or_ret(slice s) impure asm "32 LDUQ" "IFNOTRET";
+(int, slice, int) udict_get_next?::exist(cell dict, int key_len, int pivot) asm(pivot dict key_len -> 1 0 2) "DICTUGETNEXT";
 
 () recv_internal(int my_balance, int msg_value, cell in_msg_full, slice in_msg_body) impure {
 
@@ -73,27 +74,27 @@ builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
 
         int total_share = 0;
         int key = -1;
+        int users_cnt = 0;
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
             if (f) {
                 total_share += cs.preload_uint(32);
+                users_cnt += 1;
             }
         } until (~ f);
 
         ;; builder prebuild = begin_cell().store_uint(0x18, 6).store_uint(4, 3).store_int(0, 8);
         builder prebuild = begin_cell().store_uint(50176, 6 + 3 + 8);
         int key = -1;
-        do {
-            (key, slice cs, int f) = users.udict_get_next?(256, key);
-            if (f) {
-                int share = cs.preload_uint(32);
-                send_raw_message(prebuild
-                    .store_uint(key, 256)
-                    .store_coins(muldiv(share, msg_value, total_share))
-                    .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
-                .end_cell(), 1);
-            }
-        } until (~ f);
+        repeat (users_cnt) {
+            (key, slice cs, int f) = users.udict_get_next?::exist(256, key);
+            int share = cs.preload_uint(32);
+            send_raw_message(prebuild
+                .store_uint(key, 256)
+                .store_coins(muldiv(share, msg_value, total_share))
+                .store_uint(0, 1 + 4 + 4 + 64 + 32 + 1 + 1)
+            .end_cell(), 1);
+        }
         commit();  ;; cuz no need
         throw(0);  ;; to update storage
         ;; return ();
@@ -107,10 +108,12 @@ builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
 
         int total_share = 0;
         int key = -1;
+        int users_cnt = 0;
         do {
             (key, slice cs, int f) = users.udict_get_next?(256, key);
             if (f) {
                 total_share += cs.preload_uint(32);
+                users_cnt += 1;
             }
         } until (~ f);
 
@@ -125,27 +128,25 @@ builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
             .store_coins(20000000)
             .store_uint(1, 1 + 4 + 4 + 64 + 32 + 1 + 1);
         int key = -1;
-        do {
-            (key, slice cs, int f) = users.udict_get_next?(256, key);
-            if (f) {
-                int share = cs.preload_uint(32);
-                send_raw_message(prebuild
-                    .store_ref(
-                        begin_cell()
-                            .store_uint(0x0f8a7ea5, 32)
-                            .store_uint(query_id, 64)
-                            .store_coins(muldiv(share, amount, total_share))
-                            .store_uint(4, 3).store_int(0, 8).store_uint(key, 256)
-                            .store_uint(4, 3).store_int(0, 8).store_uint(key, 256)
-                            ;; .store_uint(0, 1)
-                            ;; .store_coins(1)
-                            ;; .store_uint(0, 1)
-                            .store_uint(514, 14)
-                        .end_cell()
-                    )
-                .end_cell(), 1);
-            }
-        } until (~ f);
+        repeat (users_cnt) {
+            (key, slice cs, int f) = users.udict_get_next?::exist(256, key);
+            int share = cs.preload_uint(32);
+            send_raw_message(prebuild
+                .store_ref(
+                    begin_cell()
+                        .store_uint(0x0f8a7ea5, 32)
+                        .store_uint(query_id, 64)
+                        .store_coins(muldiv(share, amount, total_share))
+                        .store_uint(4, 3).store_int(0, 8).store_uint(key, 256)
+                        .store_uint(4, 3).store_int(0, 8).store_uint(key, 256)
+                        ;; .store_uint(0, 1)
+                        ;; .store_coins(1)
+                        ;; .store_uint(0, 1)
+                        .store_uint(514, 14)
+                    .end_cell()
+                )
+            .end_cell(), 1);
+        }
         commit();
         throw(0);
         ;; return ();
