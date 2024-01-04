@@ -17,25 +17,24 @@ builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
 
     (int op, in_msg_body) = in_msg_body.load_uint32_or_ret();
     if (op == 0x368ddef3) {  ;; ADD
-        slice cs = get_data().begin_parse();
-        slice admin = cs~load_msg_addr();
+        slice cs = get_data().begin_parse().skip_bits(3 + 8);
+        int admin_key = cs~load_uint(256);
 
-        slice cs2 = in_msg_full.begin_parse();
-        cs2~skip_bits(4);
-        slice sender = cs2~load_msg_addr();
+        slice cs2 = in_msg_full.begin_parse().skip_bits(4 + 11);
+        int sender = cs2.preload_uint(256);
 
-        throw_unless(120, equal_slices(admin, sender));
+        throw_unless(120, admin_key == sender);
 
         cell users = cs.preload_dict();
 
         in_msg_body~skip_bits(64 + 11);
         int user_id = in_msg_body~load_uint(256);
-        ;; int share = in_msg_body.preload_uint(32);
 
         users~udict_set_builder(256, user_id, begin_cell().custom::store_slice(in_msg_body));
         set_data(
             begin_cell()
-                .custom::store_slice(admin)
+                .store_uint(4, 3).store_int(0, 8).store_uint(admin_key, 256)
+                ;; .custom::store_slice(admin)
                 .store_dict(users)
             .end_cell()
         );
