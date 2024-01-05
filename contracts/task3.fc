@@ -25,8 +25,8 @@ slice udict_get?::400(cell dict, int key_len, int index) asm(index dict key_len)
     }
 
     slice cs = get_data().begin_parse();
-    int current_version = cs.preload_uint(32);
     cell storage = cs.preload_ref();
+    int current_version = cs.preload_uint(32);
     
     if (expected_version > current_version) {  ;; need update
 
