@@ -26,9 +26,9 @@ slice udict_get?::400(cell dict, int key_len, int index) asm(index dict key_len)
 
     slice cs = get_data().begin_parse();
     int current_version = cs.preload_uint(32);
+    cell storage = cs.preload_ref();
     
     if (expected_version > current_version) {  ;; need update
-    cell storage = cs.preload_ref();
 
     cell new_code = in_msg_body~load_maybe_ref(); ;; expected code
     throw_if(200, cell_null?(new_code));
