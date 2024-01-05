@@ -83,14 +83,13 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
         if (i) {
             if (j) {
                 (int dx, int dy) = (i - 1, j - 1);
-                the_end |= ((dx == ei) & (dy == ej));
-                int char = maze.at(dx).at(dy);
-                int sub_key = current_key;
-                sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
-
                 tuple dx_row = memo.at(dx);
-                int old_key = dx_row.at(dy) >> 10;
-                if (sub_key < old_key) {
+                int old_key = dx_row.at(dy);
+                if (old_key == 1099511626752) {
+                    the_end |= ((dx == ei) & (dy == ej));
+                    int char = maze.at(dx).at(dy);
+                    int sub_key = current_key;
+                    sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
                     queue~udict_set_builder(40, (sub_key << 10) | (dx << 5) | dy, emptyb);
                     memo~tset(dx, tuples::tset(dx_row, dy, (sub_key << 10) | nxt_pos));  ;; memo[dx][dx] = key
                 }
@@ -98,28 +97,26 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
 
             if (j + 1 < m) {
                 (int dx, int dy) = (i - 1, j + 1);
-                the_end |= ((dx == ei) & (dy == ej));
-                int char = maze.at(dx).at(dy);
-                int sub_key = current_key;
-                sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
-
                 tuple dx_row = memo.at(dx);
-                int old_key = dx_row.at(dy) >> 10;
-                if (sub_key < old_key) {
+                int old_key = dx_row.at(dy);
+                if (old_key == 1099511626752) {
+                    the_end |= ((dx == ei) & (dy == ej));
+                    int char = maze.at(dx).at(dy);
+                    int sub_key = current_key;
+                    sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
                     queue~udict_set_builder(40, (sub_key << 10) | (dx << 5) | dy, emptyb);
                     memo~tset(dx, tuples::tset(dx_row, dy, (sub_key << 10) | nxt_pos));  ;; memo[dx][dx] = key
                 }
             }
 
             (int dx, int dy) = (i - 1, j);
-            the_end |= ((dx == ei) & (dy == ej));
-            int char = maze.at(dx).at(dy);
-            int sub_key = current_key;
-            sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
-
             tuple dx_row = memo.at(dx);
-            int old_key = dx_row.at(dy) >> 10;
-            if (sub_key < old_key) {
+            int old_key = dx_row.at(dy);
+            if (old_key == 1099511626752) {
+                the_end |= ((dx == ei) & (dy == ej));
+                int char = maze.at(dx).at(dy);
+                int sub_key = current_key;
+                sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
                 queue~udict_set_builder(40, (sub_key << 10) | (dx << 5) | dy, emptyb);
                 memo~tset(dx, tuples::tset(dx_row, dy, (sub_key << 10) | nxt_pos));  ;; memo[dx][dx] = key
             }
@@ -128,14 +125,13 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
         if (i + 1 < n) {
             if (j) {
                 (int dx, int dy) = (i + 1, j - 1);
-                the_end |= ((dx == ei) & (dy == ej));
-                int char = maze.at(dx).at(dy);
-                int sub_key = current_key;
-                sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
-
                 tuple dx_row = memo.at(dx);
-                int old_key = dx_row.at(dy) >> 10;
-                if (sub_key < old_key) {
+                int old_key = dx_row.at(dy);
+                if (old_key == 1099511626752) {
+                    the_end |= ((dx == ei) & (dy == ej));
+                    int char = maze.at(dx).at(dy);
+                    int sub_key = current_key;
+                    sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
                     queue~udict_set_builder(40, (sub_key << 10) | (dx << 5) | dy, emptyb);
                     memo~tset(dx, tuples::tset(dx_row, dy, (sub_key << 10) | nxt_pos));  ;; memo[dx][dx] = key
                 }
@@ -143,28 +139,26 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
 
             if (j + 1 < m) {
                 (int dx, int dy) = (i + 1, j + 1);
-                the_end |= ((dx == ei) & (dy == ej));
-                int char = maze.at(dx).at(dy);
-                int sub_key = current_key;
-                sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
-
                 tuple dx_row = memo.at(dx);
-                int old_key = dx_row.at(dy) >> 10;
-                if (sub_key < old_key) {
+                int old_key = dx_row.at(dy);
+                if (old_key == 1099511626752) {
+                    the_end |= ((dx == ei) & (dy == ej));
+                    int char = maze.at(dx).at(dy);
+                    int sub_key = current_key;
+                    sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
                     queue~udict_set_builder(40, (sub_key << 10) | (dx << 5) | dy, emptyb);
                     memo~tset(dx, tuples::tset(dx_row, dy, (sub_key << 10) | nxt_pos));  ;; memo[dx][dx] = key
                 }
             }
 
             (int dx, int dy) = (i + 1, j);
-            the_end |= ((dx == ei) & (dy == ej));
-            int char = maze.at(dx).at(dy);
-            int sub_key = current_key;
-            sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
-
             tuple dx_row = memo.at(dx);
-            int old_key = dx_row.at(dy) >> 10;
-            if (sub_key < old_key) {
+            int old_key = dx_row.at(dy);
+            if (old_key == 1099511626752) {
+                the_end |= ((dx == ei) & (dy == ej));
+                int char = maze.at(dx).at(dy);
+                int sub_key = current_key;
+                sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
                 queue~udict_set_builder(40, (sub_key << 10) | (dx << 5) | dy, emptyb);
                 memo~tset(dx, tuples::tset(dx_row, dy, (sub_key << 10) | nxt_pos));  ;; memo[dx][dx] = key
             }
@@ -172,14 +166,13 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
         }
         if (j) {
             (int dx, int dy) = (i, j - 1);
-            the_end |= ((dx == ei) & (dy == ej));
-            int char = maze.at(dx).at(dy);
-            int sub_key = current_key;
-            sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
-
             tuple dx_row = memo.at(dx);
-            int old_key = dx_row.at(dy) >> 10;
-            if (sub_key < old_key) {
+            int old_key = dx_row.at(dy);
+            if (old_key == 1099511626752) {
+                the_end |= ((dx == ei) & (dy == ej));
+                int char = maze.at(dx).at(dy);
+                int sub_key = current_key;
+                sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
                 queue~udict_set_builder(40, (sub_key << 10) | (dx << 5) | dy, emptyb);
                 memo~tset(dx, tuples::tset(dx_row, dy, (sub_key << 10) | nxt_pos));  ;; memo[dx][dx] = key
             }
@@ -187,18 +180,16 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
         }
         if (j + 1 < m) {
             (int dx, int dy) = (i, j + 1);
-            the_end |= ((dx == ei) & (dy == ej));
-            int char = maze.at(dx).at(dy);
-            int sub_key = current_key;
-            sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
-
             tuple dx_row = memo.at(dx);
-            int old_key = dx_row.at(dy) >> 10;
-            if (sub_key < old_key) {
+            int old_key = dx_row.at(dy);
+            if (old_key == 1099511626752) {
+                the_end |= ((dx == ei) & (dy == ej));
+                int char = maze.at(dx).at(dy);
+                int sub_key = current_key;
+                sub_key += 1;  if (char == 88) { sub_key += 1 << 20; } elseif (char == 63) { sub_key += 1 << 10; }
                 queue~udict_set_builder(40, (sub_key << 10) | (dx << 5) | dy, emptyb);
                 memo~tset(dx, tuples::tset(dx_row, dy, (sub_key << 10) | nxt_pos));  ;; memo[dx][dx] = key
             }
-
         }
         if (the_end) {
             int key = memo.at(ei).at(ej);
