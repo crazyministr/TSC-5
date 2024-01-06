@@ -30,22 +30,21 @@ slice udict_get?::400(cell dict, int key_len, int index) asm(index dict key_len)
     
     if (expected_version > current_version) {  ;; need update
 
-    cell new_code = in_msg_body~load_maybe_ref(); ;; expected code
-    throw_if(200, cell_null?(new_code));
-    cell migrations = in_msg_body~load_dict(); ;; migrations
+        cell new_code = in_msg_body~load_maybe_ref(); ;; expected code
+        throw_if(200, cell_null?(new_code));
+        cell migrations = in_msg_body~load_dict(); ;; migrations
 
-    ifnot (migrations.dict_empty?()) {
-        int key = current_version;
+        ifnot (migrations.dict_empty?()) {
         do {
-            slice cs = migrations.udict_get?::400(32, key);
-            key = cs~load_uint(32);
+            slice cs = migrations.udict_get?::400(32, current_version);
+            current_version = cs~load_uint(32);
             cell migration_code = cs.preload_maybe_ref();
             ifnot (cell_null?(migration_code)) {
                 set_c3(migration_code.begin_parse().bless());
                 storage = migrate_one(storage);
             }
-        } until (key == expected_version);
-    }
+        } until (current_version == expected_version);
+        }
         
         set_code(new_code);
         set_c3(new_code.begin_parse().bless());
