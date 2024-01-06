@@ -35,7 +35,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
     tuple memo = empty_tuple();
     tuple memo_row = empty_tuple();
     repeat (m) {
-        memo_row~tpush(1099511626752);  ;; INF: 0b1111111111 1111111111 1111111111 0000000000
+        memo_row~tpush(-1);  ;; INF: 0b1111111111 1111111111 1111111111 0000000000
     }
     repeat (n) {
         int j = 0;
@@ -85,7 +85,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                 (int dx, int dy) = (i - 1, j - 1);
                 tuple dx_row = memo.at(dx);
                 int old_key = dx_row.at(dy);
-                if (old_key == 1099511626752) {
+                if (old_key == -1) {
                     the_end |= ((dx == ei) & (dy == ej));
                     int char = maze.at(dx).at(dy);
                     int sub_key = current_key;
@@ -99,7 +99,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                 (int dx, int dy) = (i - 1, j + 1);
                 tuple dx_row = memo.at(dx);
                 int old_key = dx_row.at(dy);
-                if (old_key == 1099511626752) {
+                if (old_key == -1) {
                     the_end |= ((dx == ei) & (dy == ej));
                     int char = maze.at(dx).at(dy);
                     int sub_key = current_key;
@@ -112,7 +112,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
             (int dx, int dy) = (i - 1, j);
             tuple dx_row = memo.at(dx);
             int old_key = dx_row.at(dy);
-            if (old_key == 1099511626752) {
+            if (old_key == -1) {
                 the_end |= ((dx == ei) & (dy == ej));
                 int char = maze.at(dx).at(dy);
                 int sub_key = current_key;
@@ -127,7 +127,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                 (int dx, int dy) = (i + 1, j - 1);
                 tuple dx_row = memo.at(dx);
                 int old_key = dx_row.at(dy);
-                if (old_key == 1099511626752) {
+                if (old_key == -1) {
                     the_end |= ((dx == ei) & (dy == ej));
                     int char = maze.at(dx).at(dy);
                     int sub_key = current_key;
@@ -141,7 +141,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                 (int dx, int dy) = (i + 1, j + 1);
                 tuple dx_row = memo.at(dx);
                 int old_key = dx_row.at(dy);
-                if (old_key == 1099511626752) {
+                if (old_key == -1) {
                     the_end |= ((dx == ei) & (dy == ej));
                     int char = maze.at(dx).at(dy);
                     int sub_key = current_key;
@@ -154,7 +154,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
             (int dx, int dy) = (i + 1, j);
             tuple dx_row = memo.at(dx);
             int old_key = dx_row.at(dy);
-            if (old_key == 1099511626752) {
+            if (old_key == -1) {
                 the_end |= ((dx == ei) & (dy == ej));
                 int char = maze.at(dx).at(dy);
                 int sub_key = current_key;
@@ -168,7 +168,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
             (int dx, int dy) = (i, j - 1);
             tuple dx_row = memo.at(dx);
             int old_key = dx_row.at(dy);
-            if (old_key == 1099511626752) {
+            if (old_key == -1) {
                 the_end |= ((dx == ei) & (dy == ej));
                 int char = maze.at(dx).at(dy);
                 int sub_key = current_key;
@@ -182,7 +182,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
             (int dx, int dy) = (i, j + 1);
             tuple dx_row = memo.at(dx);
             int old_key = dx_row.at(dy);
-            if (old_key == 1099511626752) {
+            if (old_key == -1) {
                 the_end |= ((dx == ei) & (dy == ej));
                 int char = maze.at(dx).at(dy);
                 int sub_key = current_key;
