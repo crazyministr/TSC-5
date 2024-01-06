@@ -50,7 +50,7 @@ slice udict_get?::400(cell dict, int key_len, int index) asm(index dict key_len)
         set_c3(new_code.begin_parse().bless());
     }
 
-    cell payload = in_msg_body.preload_ref();
+    cell payload = in_msg_body~load_ref();
     storage = process_message(storage, msg_value, balance, in_msg_full, payload.begin_parse());
     set_data(begin_cell().store_uint(expected_version, 32).store_ref(storage).end_cell());
 }
