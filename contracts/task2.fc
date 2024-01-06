@@ -53,7 +53,7 @@ builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
 
         cell users = cs.preload_dict();
 
-        in_msg_body~skip_bits(64 + 11);
+        in_msg_body~load_uint(64 + 11);
         int user_id = in_msg_body.preload_uint(256);
 
         slice cs = users~udict_delete_get?::121(256, user_id);
@@ -100,7 +100,7 @@ builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
         throw(0);  ;; to update storage
         ;; return ();
     }
-    if (op == 0x7362d09c) {  ;; JETTON TRANSFER
+;;    if (op == 0x7362d09c) {  ;; JETTON TRANSFER
         var cs = get_data().begin_parse().skip_bits(267);
         ;; slice admin = cs~load_msg_addr();
         cell users = cs.preload_dict();
@@ -149,10 +149,10 @@ builder custom::store_slice(builder b, slice s) asm(s b) "STSLICE";
                 )
             .end_cell(), 1);
         }
-        commit();
-        throw(0);
+  ;;      commit();
+    ;;    throw(0);
         ;; return ();
-    }
+;;    }
 }
 
 cell get_users() method_id {
