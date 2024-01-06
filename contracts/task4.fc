@@ -67,7 +67,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
     ;; ]);
 
     int flatten_start = (si << 5) | sj;
-
+    int the_end = 0;
     builder emptyb = begin_cell();
     cell queue = new_dict();
     queue~udict_set_builder(40, flatten_start, emptyb);
@@ -79,7 +79,6 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
         int i = nxt_pos >> 5;
         int j = nxt_pos & ((1 << 5) - 1);
 
-        int the_end = 0;
         if (i) {
             if (j) {
                 (int dx, int dy) = (i - 1, j - 1);
