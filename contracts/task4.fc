@@ -85,7 +85,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                 int old_key = dx_row.at(dy);
                 if (old_key == -1) {
                     if ((dx == ei) & (dy == ej)) {
-            int key = sub_key;
+            int key = current_key;
             int sb = nxt_pos;
             int  L = key & ((1 << 10) - 1); key >>= 10;
             int  Q = key & ((1 << 10) - 1); key >>= 10;
@@ -113,7 +113,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                 int old_key = dx_row.at(dy);
                 if (old_key == -1) {
                     if ((dx == ei) & (dy == ej)) {
-            int key = sub_key;
+            int key = current_key;
             int sb = nxt_pos;
             int  L = key & ((1 << 10) - 1); key >>= 10;
             int  Q = key & ((1 << 10) - 1); key >>= 10;
@@ -140,7 +140,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
             int old_key = dx_row.at(dy);
             if (old_key == -1) {
                 if ((dx == ei) & (dy == ej)) {
-            int key = sub_key;
+            int key = current_key;
             int sb = nxt_pos;
             int  L = key & ((1 << 10) - 1); key >>= 10;
             int  Q = key & ((1 << 10) - 1); key >>= 10;
@@ -169,7 +169,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                 int old_key = dx_row.at(dy);
                 if (old_key == -1) {
                     if ((dx == ei) & (dy == ej)) {
-            int key = sub_key;
+            int key = current_key;
             int sb = nxt_pos;
             int  L = key & ((1 << 10) - 1); key >>= 10;
             int  Q = key & ((1 << 10) - 1); key >>= 10;
@@ -197,7 +197,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
                 int old_key = dx_row.at(dy);
                 if (old_key == -1) {
                     if ((dx == ei) & (dy == ej)) {
-            int key = sub_key;
+            int key = current_key;
             int sb = nxt_pos;
             int  L = key & ((1 << 10) - 1); key >>= 10;
             int  Q = key & ((1 << 10) - 1); key >>= 10;
@@ -224,7 +224,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
             int old_key = dx_row.at(dy);
             if (old_key == -1) {
                 if ((dx == ei) & (dy == ej)) {
-            int key = sub_key;
+            int key = current_key;
             int sb = nxt_pos;
             int  L = key & ((1 << 10) - 1); key >>= 10;
             int  Q = key & ((1 << 10) - 1); key >>= 10;
@@ -252,7 +252,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
             int old_key = dx_row.at(dy);
             if (old_key == -1) {
                 if ((dx == ei) & (dy == ej)) {
-            int key = sub_key;
+            int key = current_key;
             int sb = nxt_pos;
             int  L = key & ((1 << 10) - 1); key >>= 10;
             int  Q = key & ((1 << 10) - 1); key >>= 10;
@@ -280,7 +280,7 @@ forall X -> tuple tuples::tset(tuple t, int k, X x) asm(t x k) "SETINDEXVAR";
             int old_key = dx_row.at(dy);
             if (old_key == -1) {
                 if ((dx == ei) & (dy == ej)) {
-            int key = sub_key;
+            int key = current_key;
             int sb = nxt_pos;
             int  L = key & ((1 << 10) - 1); key >>= 10;
             int  Q = key & ((1 << 10) - 1); key >>= 10;
